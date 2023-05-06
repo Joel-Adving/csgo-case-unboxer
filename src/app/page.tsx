@@ -1,113 +1,100 @@
+'use client'
+
 import Image from 'next/image'
+import { useEffect, useMemo, useState } from 'react'
+import { CaseType, SkinType } from '../types'
+import { baseUrl, gradeColors } from '@/constants'
+import { sortSkinByRarity } from '@/utils/helpers'
 
 export default function Home() {
+  const [cases, setCases] = useState<CaseType[]>([])
+  const [allSkins, setAllSkins] = useState<SkinType[]>([])
+  const [selectedCase, setSelectedCase] = useState<CaseType>()
+  const [skins, setSkins] = useState<SkinType[]>([])
+  const [showKnifesAndGloves, setShowKnifesAndGloves] = useState(false)
+
+  const filteredSkins = useMemo(
+    () => (showKnifesAndGloves ? skins : skins.filter((s) => !['Extraordinary', 'Covert'].includes(s.rarity))),
+    [showKnifesAndGloves, skins]
+  )
+
+  const getSelectedCaseSkins = (_case: CaseType) => {
+    const contains = [..._case.contains, ..._case.contains_rare]
+    const skins = Array.from(
+      new Set(contains.map((skin) => allSkins.find((s) => s.name === skin.name)).filter((s) => s !== undefined))
+    ) as SkinType[]
+    setSkins(sortSkinByRarity(skins))
+    setSelectedCase(_case)
+    window.scrollTo({ top: 0 })
+  }
+
+  useEffect(() => {
+    fetch(baseUrl + 'skins.json')
+      .then((res) => res.json())
+      .then((data) => setAllSkins(data))
+    fetch(baseUrl + 'crates/cases.json')
+      .then((res) => res.json())
+      .then((data) => setCases(data.reverse()))
+  }, [])
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
+    <main className="w-full max-w-5xl p-3 mx-auto ">
+      {selectedCase && (
+        <section className="min-h-screen">
+          <div className="flex flex-col">
+            <p className="mb-1 text-2xl font-bold text-center">{selectedCase.name}</p>
             <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
+              quality={100}
+              width={500}
+              height={500}
+              src={selectedCase.image}
+              className="w-[12rem] mx-auto"
+              alt=""
               priority
             />
-          </a>
-        </div>
-      </div>
+            <button className="px-4 py-1 mx-auto my-1 text-xl bg-green-400 rounded w-fit text-gray-950">Open case</button>
+          </div>
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+          {skins.length > 0 ? (
+            <div className="flex flex-col">
+              <div className="p-6 mt-4 rounded gap-x-6 gap-y-4 bg-zinc-800 responsiveGrid">
+                {filteredSkins.map((skin, i: number) => (
+                  <div key={i}>
+                    <Image
+                      width={200}
+                      height={200}
+                      src={skin.image}
+                      alt=""
+                      priority
+                      className={`${gradeColors[skin.rarity]} border-l-4 bg-zinc-700 p-4 rounded`}
+                    />
+                    <p className={`mt-2 text-xs text-center`}>{skin.name}</p>
+                  </div>
+                ))}
+              </div>
+              <button
+                className="px-2 py-1 mx-auto mt-6 mb-12 rounded w-fit bg-zinc-700"
+                onClick={() => setShowKnifesAndGloves((prev) => !prev)}
+              >
+                {showKnifesAndGloves ? 'Hide' : 'Show'} knifes and gloves
+              </button>
+            </div>
+          ) : null}
+        </section>
+      )}
 
-      <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://beta.nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800 hover:dark:bg-opacity-30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+      <section className="gap-6 responsiveGrid">
+        {cases?.map((_case, i: number) => (
+          <div
+            key={i}
+            className="transition-transform duration-75 cursor-pointer hover:scale-105"
+            onClick={() => getSelectedCaseSkins(_case)}
+          >
+            <Image width={200} height={200} src={_case.image} alt="" priority />
+            <p className="text-center">{_case.name}</p>
+          </div>
+        ))}
+      </section>
     </main>
   )
 }
