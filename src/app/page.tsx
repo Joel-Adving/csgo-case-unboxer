@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useEffect, useMemo, useState } from 'react'
-import { baseUrl, gradeColors, ignoredCovertGunSkins } from '@/constants'
+import { GRADE_COLORS, ignoredCovertGunSkins } from '@/constants'
 import { sortSkinByRarity } from '@/utils/helpers'
 import { CaseType, SkinType } from '@/types'
 
@@ -27,9 +27,8 @@ export default function Home() {
             if (['Extraordinary', 'Covert'].includes(s.rarity)) {
               if (ignoredCovertGunSkins.includes(s.weapon)) {
                 return true
-              } else {
-                return false
               }
+              return false
             }
             return true
           }),
@@ -50,9 +49,9 @@ export default function Home() {
     ;(async () => {
       try {
         const [skinsRes, casesRes, souvenirRes] = await Promise.all([
-          fetch(baseUrl + 'skins.json'),
-          fetch(baseUrl + 'crates/cases.json'),
-          fetch(baseUrl + 'crates/souvenir.json')
+          fetch('/data/skins.json'),
+          fetch('/data/crates/cases.json'),
+          fetch('/data/crates/souvenir.json')
         ])
         const skinsData = await skinsRes.json()
         const casesData = await casesRes.json()
@@ -95,7 +94,7 @@ export default function Home() {
                       src={skin.image}
                       alt=""
                       priority
-                      className={`${gradeColors[skin.rarity]} border-l-4 bg-zinc-700 p-4 rounded`}
+                      className={`${GRADE_COLORS[skin.rarity]} border-l-4 bg-zinc-700 p-4 rounded`}
                     />
                     <p className={`mt-2 text-xs text-center`}>{skin.name}</p>
                   </div>

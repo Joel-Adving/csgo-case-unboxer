@@ -1,6 +1,6 @@
 import { SkinType } from '@/types'
-import { gradeLevels } from '@/constants'
+import { GRADE_LEVELS } from '@/constants'
 
 export const sortSkinByRarity = (skins: SkinType[]) => {
-  return skins.sort((a, b) => gradeLevels[a.rarity] - gradeLevels[b.rarity])
+  return skins.sort((a, b) => GRADE_LEVELS[a.rarity] - GRADE_LEVELS[b.rarity])
 }

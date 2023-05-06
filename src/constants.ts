@@ -1,6 +1,6 @@
-export const baseUrl = 'https://bymykel.github.io/CSGO-API/api/en/'
+export const API_URL = 'https://bymykel.github.io/CSGO-API/api/en/'
 
-export const gradeLevels = {
+export const GRADE_LEVELS = {
   Consumer: 1,
   'Industrial Grade': 2,
   'Mil-Spec Grade': 3,
@@ -10,7 +10,7 @@ export const gradeLevels = {
   Extraordinary: 7
 } as const
 
-export const gradeColors = {
+export const GRADE_COLORS = {
   Consumer: 'border-gray-500',
   'Industrial Grade': 'border-blue-500',
   'Mil-Spec Grade': 'border-blue-500',
