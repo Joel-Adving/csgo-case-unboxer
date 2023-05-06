@@ -8,7 +8,7 @@ export const gradeLevels = {
   Classified: 5,
   Covert: 6,
   Extraordinary: 7
-}
+} as const
 
 export const gradeColors = {
   Consumer: 'border-gray-500',
@@ -18,4 +18,22 @@ export const gradeColors = {
   Classified: 'border-red-500',
   Covert: 'border-yellow-500',
   Extraordinary: 'border-yellow-500'
-}
+} as const
+
+export const ignoredCovertGunSkins = [
+  'SSG 08',
+  'AUG',
+  'M4A4',
+  'FAMAS',
+  'Galil AR',
+  'P90',
+  'MP9',
+  'MP7',
+  'PP-Bizon',
+  'MAC-10',
+  'Sawed-Off',
+  'Five-SeveN',
+  'CZ75-Auto',
+  'P250',
+  'R8 Revolver'
+]

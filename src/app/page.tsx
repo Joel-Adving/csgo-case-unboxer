@@ -2,9 +2,9 @@
 
 import Image from 'next/image'
 import { useEffect, useMemo, useState } from 'react'
-import { CaseType, SkinType } from '../types'
-import { baseUrl, gradeColors } from '@/constants'
+import { baseUrl, gradeColors, ignoredCovertGunSkins } from '@/constants'
 import { sortSkinByRarity } from '@/utils/helpers'
+import { CaseType, SkinType } from '@/types'
 
 export default function Home() {
   const [cases, setCases] = useState<CaseType[]>([])
@@ -12,9 +12,27 @@ export default function Home() {
   const [selectedCase, setSelectedCase] = useState<CaseType>()
   const [skins, setSkins] = useState<SkinType[]>([])
   const [showKnifesAndGloves, setShowKnifesAndGloves] = useState(false)
+  const [showSouvenirCases, setShowSouvenirCases] = useState(false)
+
+  const filteredCases = useMemo(
+    () => (showSouvenirCases ? cases : cases.filter((c) => c.type !== 'Souvenir')),
+    [showSouvenirCases, cases]
+  )
 
   const filteredSkins = useMemo(
-    () => (showKnifesAndGloves ? skins : skins.filter((s) => !['Extraordinary', 'Covert'].includes(s.rarity))),
+    () =>
+      showKnifesAndGloves
+        ? skins
+        : skins.filter((s) => {
+            if (['Extraordinary', 'Covert'].includes(s.rarity)) {
+              if (ignoredCovertGunSkins.includes(s.weapon)) {
+                return true
+              } else {
+                return false
+              }
+            }
+            return true
+          }),
     [showKnifesAndGloves, skins]
   )
 
@@ -29,16 +47,27 @@ export default function Home() {
   }
 
   useEffect(() => {
-    fetch(baseUrl + 'skins.json')
-      .then((res) => res.json())
-      .then((data) => setAllSkins(data))
-    fetch(baseUrl + 'crates/cases.json')
-      .then((res) => res.json())
-      .then((data) => setCases(data.reverse()))
+    ;(async () => {
+      try {
+        const [skinsRes, casesRes, souvenirRes] = await Promise.all([
+          fetch(baseUrl + 'skins.json'),
+          fetch(baseUrl + 'crates/cases.json'),
+          fetch(baseUrl + 'crates/souvenir.json')
+        ])
+        const skinsData = await skinsRes.json()
+        const casesData = await casesRes.json()
+        const souvenirData = await souvenirRes.json()
+        const allCases = [...casesData, ...souvenirData]
+        setAllSkins(skinsData)
+        setCases(allCases.reverse())
+      } catch (e) {
+        console.log(e)
+      }
+    })()
   }, [])
 
   return (
-    <main className="w-full max-w-5xl p-3 mx-auto ">
+    <main className="w-full max-w-5xl p-3 mx-auto">
       {selectedCase && (
         <section className="min-h-screen">
           <div className="flex flex-col">
@@ -73,7 +102,7 @@ export default function Home() {
                 ))}
               </div>
               <button
-                className="px-2 py-1 mx-auto mt-6 mb-12 rounded w-fit bg-zinc-700"
+                className="px-2.5 py-1 mx-auto mt-6 rounded w-fit bg-zinc-700"
                 onClick={() => setShowKnifesAndGloves((prev) => !prev)}
               >
                 {showKnifesAndGloves ? 'Hide' : 'Show'} knifes and gloves
@@ -83,17 +112,35 @@ export default function Home() {
         </section>
       )}
 
-      <section className="gap-6 responsiveGrid">
-        {cases?.map((_case, i: number) => (
-          <div
-            key={i}
-            className="transition-transform duration-75 cursor-pointer hover:scale-105"
-            onClick={() => getSelectedCaseSkins(_case)}
-          >
-            <Image width={200} height={200} src={_case.image} alt="" priority />
-            <p className="text-center">{_case.name}</p>
-          </div>
-        ))}
+      <section className="flex flex-col">
+        <button
+          className="px-2.5 py-1 mx-auto mt-6 mb-12 rounded w-fit bg-zinc-700"
+          onClick={() => setShowSouvenirCases((prev) => !prev)}
+        >
+          {showSouvenirCases ? 'Hide' : 'Show'} souvenir cases
+        </button>
+        <div className="gap-5 responsiveGrid">
+          {filteredCases?.map((_case, i: number) => {
+            const selected = selectedCase?.id === _case.id
+            return (
+              <div
+                key={i}
+                className={`transition-transform duration-75 cursor-pointer hover:scale-105`}
+                onClick={() => getSelectedCaseSkins(_case)}
+              >
+                <Image
+                  width={200}
+                  height={200}
+                  src={_case.image}
+                  alt=""
+                  priority
+                  className={`${selected && 'bg-zinc-700 rounded border p-3'}`}
+                />
+                <p className={`${selected && 'underline'} text-center mt-2`}>{_case.name}</p>
+              </div>
+            )
+          })}
+        </div>
       </section>
     </main>
   )
