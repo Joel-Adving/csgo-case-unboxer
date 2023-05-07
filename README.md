@@ -1,5 +1,5 @@
 
-## Getting Started
+## CS:GO Skin/Case Unboxer
 
 First, install deps:
 
