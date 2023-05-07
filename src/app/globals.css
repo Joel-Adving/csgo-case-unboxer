@@ -6,6 +6,10 @@
   color-scheme: dark;
 }
 
+body {
+  @apply bg-neutral-900;
+}
+
 img {
   width: 100%;
   height: auto;
