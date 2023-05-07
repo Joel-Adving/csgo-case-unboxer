@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { GRADE_COLORS, GRADE_COLORS_BORDER, ODDS, ODDS_GRADES, ignoredCovertGunSkins } from '@/constants'
+import { API_URL, GRADE_COLORS, GRADE_COLORS_BORDER, ODDS, ODDS_GRADES, ignoredCovertGunSkins } from '@/constants'
 import { sortSkinByRarity } from '@/utils/helpers'
 import { CaseType, SkinType } from '@/types'
 
@@ -112,9 +112,9 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       const [skinsRes, casesRes, souvenirRes] = await Promise.all([
-        fetch('/data/skins.json'),
-        fetch('/data/crates/cases.json'),
-        fetch('/data/crates/souvenir.json')
+        fetch(API_URL + '/skins.json'),
+        fetch(API_URL + '/crates/cases.json'),
+        fetch(API_URL + '/crates/souvenir.json')
       ])
       const skinsData = await skinsRes.json()
       const casesData = await casesRes.json()
