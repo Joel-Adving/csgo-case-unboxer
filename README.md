@@ -1,7 +1,7 @@
 
 ## CS:GO Skin/Case Unboxer
 
-# Live demo: https://csgo-case-unboxer.vercel.app/
+### Live demo: https://csgo-case-unboxer.vercel.app/
 
 First, install deps:
 
