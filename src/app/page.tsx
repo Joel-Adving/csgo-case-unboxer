@@ -73,6 +73,7 @@ export default function Home() {
   const getSelectedCaseSkins = (_case: CaseType) => {
     setWonSkin(null)
     setSliderSkins(null)
+    setAnimating(false)
     const contains = [..._case.contains, ..._case.contains_rare]
     const skins = Array.from(
       new Set(contains.map((skin) => allSkins.find((s) => s.name === skin.name)).filter((s) => s !== undefined))
@@ -189,7 +190,7 @@ export default function Home() {
                 className="px-4 py-1 mx-auto mt-2 mb-1 text-gray-300 bg-gray-600 rounded w-fit"
                 onClick={() => setFastMode((prev) => !prev)}
               >
-                {fastMode ? 'Normal' : 'Fast'}
+                {fastMode ? '4x Speed' : '1x Speed'}
               </button>
             </div>
           </div>
