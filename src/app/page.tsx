@@ -146,9 +146,7 @@ export default function Home() {
               <div className="flex flex-col gap-2">
                 {inventory.map((skin, i) => (
                   <div key={i} className="flex flex-col items-center gap-2">
-                    <Image
-                      width={200}
-                      height={200}
+                    <img
                       src={skin.image}
                       alt=""
                       className={`border-${
@@ -168,15 +166,7 @@ export default function Home() {
         <section className="min-h-screen">
           <div className="flex flex-col">
             <p className="mb-1 text-lg font-bold text-center sm:text-2xl">{selectedCase.name}</p>
-            <Image
-              quality={100}
-              width={500}
-              height={500}
-              src={selectedCase.image}
-              className="sm:max-w-[12rem] w-full max-w-[8rem]  mx-auto"
-              alt=""
-              priority
-            />
+            <img src={selectedCase.image} className="sm:max-w-[12rem] w-full max-w-[8rem]  mx-auto" alt="" />
             <div className="flex gap-4 mx-auto text-xl w-fit">
               <button
                 disabled={animating}
@@ -202,9 +192,7 @@ export default function Home() {
                 <div ref={sliderElement} className="absolute left-0 top-0 flex gap-3 translate-x-[-80%]">
                   {sliderSkins.map((skin, i) => (
                     <div key={i}>
-                      <Image
-                        width={200}
-                        height={200}
+                      <img
                         src={skin.image}
                         className={`border-${
                           GRADE_COLORS[skin.rarity]
@@ -223,9 +211,7 @@ export default function Home() {
               <div id="skins" className="p-6 mt-4 rounded gap-x-6 gap-y-4 bg-zinc-800 responsiveGrid">
                 {filteredSkins.map((skin, i: number) => (
                   <div key={i}>
-                    <Image
-                      width={200}
-                      height={200}
+                    <img
                       src={skin.image}
                       alt=""
                       className={` ${GRADE_COLORS_BORDER[skin.rarity]} border-l-4 bg-zinc-700 p-4 rounded`}
@@ -264,14 +250,7 @@ export default function Home() {
                 className={`transition-transform duration-75 cursor-pointer hover:scale-105`}
                 onClick={() => getSelectedCaseSkins(_case)}
               >
-                <Image
-                  width={200}
-                  height={200}
-                  src={_case.image}
-                  alt=""
-                  priority
-                  className={`${selected && 'bg-zinc-700 rounded border p-3'}`}
-                />
+                <img src={_case.image} alt="" className={`${selected && 'bg-zinc-700 rounded border p-3'}`} />
                 <p className={`${selected && 'underline'} text-center mt-2`}>{_case.name}</p>
               </div>
             )
