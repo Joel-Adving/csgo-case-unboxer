@@ -1,6 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
+
 'use client'
 
-import Image from 'next/image'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { API_URL, GRADE_COLORS, GRADE_COLORS_BORDER, ODDS, ODDS_GRADES, ignoredCovertGunSkins } from '@/constants'
 import { sortSkinByRarity } from '@/utils/helpers'
