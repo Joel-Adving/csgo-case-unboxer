@@ -12,8 +12,10 @@ const nextConfig = {
         protocol: 'http',
         hostname: '**'
       }
-    ]
-  }
+    ],
+    minimumCacheTTL: 2592000 // 30 days
+  },
+  output: 'standalone'
 }
 
 module.exports = nextConfig
