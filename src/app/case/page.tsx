@@ -1,5 +1,7 @@
-import CaseGrid from '@/components/CaseGrid'
+import Grid from '@/components/CaseGrid'
+import { getCases } from '@/server/serverFunctions'
 
-export default function CasePage() {
-  return <CaseGrid type="case" />
+export default async function CasePage() {
+  const cases = await getCases()
+  return <Grid cases={cases} />
 }

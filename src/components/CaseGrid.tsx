@@ -1,15 +1,10 @@
-'use client'
-
-import { useGetCasesQuery, useGetSouvenirsQuery } from '@/redux/services/csgoApi'
 import { Case } from '@/types'
 import Image from 'next/image'
 import Link from 'next/link'
 
-type CaseType = 'case' | 'souvenir'
-
-const Grid = ({ cases }: { cases: Case[] }) => {
+export default function Grid({ cases }: { cases: Case[] }) {
   return (
-    <div className="grid gap-5 responsiveGrid">
+    <div className="grid gap-5 responsiveGrid p-[8vh]">
       {cases
         ?.slice()
         ?.reverse()
@@ -23,26 +18,4 @@ const Grid = ({ cases }: { cases: Case[] }) => {
         ))}
     </div>
   )
-}
-
-export default function CaseGrid({ type }: { type: CaseType }) {
-  const { data: cases } = useGetCasesQuery(null, {
-    skip: type !== 'case'
-  })
-
-  const { data: souvenirs } = useGetSouvenirsQuery(null, {
-    skip: type !== 'souvenir'
-  })
-
-  console.log(souvenirs)
-
-  if (cases?.length) {
-    return <Grid cases={cases} />
-  }
-
-  if (souvenirs?.length) {
-    return <Grid cases={souvenirs} />
-  }
-
-  return null
 }

@@ -1,5 +1,7 @@
-import CaseGrid from '@/components/CaseGrid'
+import Grid from '@/components/CaseGrid'
+import { getSouvenirs } from '@/server/serverFunctions'
 
-export default function SouvenirPage() {
-  return <CaseGrid type="souvenir" />
+export default async function SouvenirPage() {
+  const souvenirs = await getSouvenirs()
+  return <Grid cases={souvenirs} />
 }

@@ -10,11 +10,20 @@ export const GRADE_LEVELS = {
   Extraordinary: 7
 } as const
 
-export const ODDS = [
-  [0.19, 1],
-  [0.07, 0.19],
-  [0.03, 0.07],
-  [0, 0.03]
+// Real odds
+export const REAL_ODDS = [
+  [0.2, 1],
+  [0.06, 0.2],
+  [0.01, 0.06],
+  [0, 0.01]
+]
+
+// fun odds
+export const FUN_ODDS = [
+  [0.5, 1],
+  [0.3, 0.5],
+  [0.2, 0.3],
+  [0, 0.2]
 ]
 
 export const ODDS_GRADES = [
@@ -28,7 +37,7 @@ export const GRADE_COLORS = {
   Consumer: 'gray',
   'Industrial Grade': 'blue',
   'Mil-Spec Grade': 'blue',
-  Restricted: 'purple',
+  Restricted: 'indigo',
   Classified: 'red',
   Covert: 'yellow',
   Extraordinary: 'yellow'
@@ -38,7 +47,7 @@ export const GRADE_COLORS_BORDER = {
   Consumer: 'border-gray-500',
   'Industrial Grade': 'border-blue-500',
   'Mil-Spec Grade': 'border-blue-500',
-  Restricted: 'border-purple-500',
+  Restricted: 'border-indigo-500',
   Classified: 'border-red-500',
   Covert: 'border-yellow-500',
   Extraordinary: 'border-yellow-500'

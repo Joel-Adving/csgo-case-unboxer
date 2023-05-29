@@ -1,9 +1,10 @@
 import { Case, Collection, Skin, Sticker } from '@/types'
+import { API_URL } from '@/utils/constants'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const csgoApi = createApi({
   reducerPath: 'csgoApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://bymykel.github.io/CSGO-API/api/en' }),
+  baseQuery: fetchBaseQuery({ baseUrl: API_URL }),
   endpoints: (builder) => ({
     getSkins: builder.query<Skin[], null>({
       query: () => '/skins.json'

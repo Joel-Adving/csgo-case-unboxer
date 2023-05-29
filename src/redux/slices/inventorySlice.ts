@@ -10,13 +10,16 @@ export type InventoryType = {
 
 const initialState: InventoryType = {
   items: [],
-  show: true
+  show: false
 }
 
 export const inventorySlice = createSlice({
   name: 'inventory',
   initialState,
   reducers: {
+    setInventory: (state, action) => {
+      state.items = action.payload
+    },
     addInventoryItem: (state, action) => {
       state.items.push(action.payload)
     },
@@ -35,7 +38,7 @@ export const inventorySlice = createSlice({
   }
 })
 
-export const { addInventoryItem, removeInventoryItem, clearInventory, setShowInventory, toggleInventory } =
+export const { addInventoryItem, removeInventoryItem, clearInventory, setShowInventory, toggleInventory, setInventory } =
   inventorySlice.actions
 export default inventorySlice.reducer
 
@@ -45,6 +48,7 @@ export const useInventory = () => {
 
   return {
     inventory,
+    setInventory: (items: Skin[]) => dispatch(setInventory(items)),
     addInventoryItem: (item: any) => dispatch(addInventoryItem(item)),
     removeInventoryItem: (id: string) => dispatch(removeInventoryItem(id)),
     clearInventory: () => dispatch(clearInventory()),
