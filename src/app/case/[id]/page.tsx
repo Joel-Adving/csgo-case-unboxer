@@ -82,7 +82,6 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
     })
     randomSkins.length = 74
     randomSkins[61] = randomSkin
-    console.log(randomSkins)
     setSliderSkins(randomSkins as Skin[])
     setWonSkin(randomSkin)
     setAnimating(true)
