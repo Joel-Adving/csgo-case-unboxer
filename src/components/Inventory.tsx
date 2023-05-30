@@ -3,7 +3,6 @@
 import Image from 'next/image'
 import { useEffect, useMemo } from 'react'
 import { useInventory } from '@/redux/slices/inventorySlice'
-import { GRADE_COLORS } from '@/utils/constants'
 
 export default function Inventory() {
   const { inventory, clearInventory, toggleInventory, setInventory, setShowInventory } = useInventory()
@@ -64,15 +63,36 @@ export default function Inventory() {
                       <span className="text-4xl">{inventory.items.length}</span> items
                     </p>
                     <div className="flex gap-4">
-                      <p className={`border-${GRADE_COLORS.Consumer}-500  border-b-4`}>{grades.Consumer}</p>
-                      <p className={`border-${GRADE_COLORS['Mil-Spec Grade']}-500  border-b-4`}>
+                      {/* <p
+                        className={`  border-b-4`}
+                        style={{ borderColor: `#${wonskin?.rarity_color}` }}
+                      >
+                        {grades.Consumer}
+                      </p>
+                      <p
+                        className={`  border-b-4`}
+                        style={{ borderColor: `#${wonskin?.rarity_color}` }}
+                      >
                         {grades['Mil-Spec Grade'] + grades['Industrial Grade']}
                       </p>
-                      <p className={`border-${GRADE_COLORS.Restricted}-500  border-b-4`}>{grades.Restricted}</p>
-                      <p className={`border-${GRADE_COLORS.Classified}-500  border-b-4`}>{grades.Classified}</p>
-                      <p className={`border-${GRADE_COLORS.Extraordinary}-500  border-b-4`}>
-                        {grades.Extraordinary + grades.Covert}
+                      <p
+                        className={`  border-b-4`}
+                        style={{ borderColor: `#${wonskin?.rarity_color}` }}
+                      >
+                        {grades.Restricted}
                       </p>
+                      <p
+                        className={`0  border-b-4`}
+                        style={{ borderColor: `#${wonskin?.rarity_color}` }}
+                      >
+                        {grades.Classified}
+                      </p>
+                      <p
+                        className={`  border-b-4`}
+                        style={{ borderColor: `#${wonskin?.rarity_color}` }}
+                      >
+                        {grades.Extraordinary + grades.Covert}
+                      </p> */}
                     </div>
                   </div>
 
@@ -100,7 +120,8 @@ export default function Inventory() {
                       height={300}
                       src={skin?.image ?? '/images/placeholder.webp'}
                       alt=""
-                      className={`border-${GRADE_COLORS[skin.rarity]}-500  border-l-8  bg-zinc-700 p-4 rounded-sm`}
+                      style={{ borderColor: `#${skin?.rarity_color}` }}
+                      className={`border-l-4  bg-zinc-700 p-4 rounded-sm`}
                     />
                     <p className="text-xs text-center">{skin.name}</p>
                   </div>

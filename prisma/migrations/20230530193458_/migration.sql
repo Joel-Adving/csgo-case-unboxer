@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Skin" ALTER COLUMN "gun_type" DROP NOT NULL,
+ALTER COLUMN "exterior" DROP NOT NULL;

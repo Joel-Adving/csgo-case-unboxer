@@ -2,24 +2,17 @@
 
 import Image from 'next/image'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import {
-  GRADE_COLORS,
-  GRADE_COLORS_BORDER,
-  FUN_ODDS,
-  ODDS_GRADES,
-  REAL_ODDS,
-  ignoredCovertGunSkins
-} from '@/utils/constants'
+import { FUN_ODDS, ODDS_GRADES, REAL_ODDS } from '@/utils/constants'
 import { useGetCasesQuery, useGetSkinsQuery, useGetSouvenirsQuery } from '@/redux/services/csgoApi'
 import { useInventory } from '@/redux/slices/inventorySlice'
-import { sortSkinByRarity } from '@/utils/helpers'
-import { Skin } from '@/types'
+import { useGetDbSkinsQuery } from '@/redux/services/api'
+import { Skin, SkinItem } from '@/types'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 export default function CaseIdPage({ params }: { params: { id: string } }) {
-  const [wonSkin, setWonSkin] = useState<Skin | null>()
-  const [sliderSkins, setSliderSkins] = useState<Skin[] | null>(null)
+  const [wonSkin, setWonSkin] = useState<SkinItem | null>()
+  const [sliderSkins, setSliderSkins] = useState<SkinItem[] | null>(null)
   const [animating, setAnimating] = useState(false)
   const [fastMode, setFastMode] = useState(false)
   const [showKnifesAndGloves, setShowKnifesAndGloves] = useState(false)
@@ -30,6 +23,7 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
   const { data: allSkins } = useGetSkinsQuery(null)
   const { data: cases } = useGetCasesQuery(null)
   const { data: souvenirs } = useGetSouvenirsQuery(null)
+  const { data: dbSkins } = useGetDbSkinsQuery(null)
 
   const { addInventoryItem } = useInventory()
 
@@ -38,23 +32,32 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
   }, [cases, params.id, souvenirs])
 
   const skins = useMemo(() => {
-    if (!selectedCase || !allSkins) return []
+    if (!selectedCase || !allSkins || !dbSkins) return []
+
     const contains = [...selectedCase.contains, ...selectedCase.contains_rare]
     const skins = Array.from(
       new Set(contains.map((skin) => allSkins.find((s) => s.name === skin.name)).filter((s) => s !== undefined))
     ) as Skin[]
-    return sortSkinByRarity(skins)
-  }, [allSkins, selectedCase])
+
+    const mergedData = skins.map((skin) => {
+      const _skin = dbSkins.find((s) => s.name.includes(skin.name))
+      return {
+        ..._skin,
+        name: skin.name,
+        image: skin?.image
+      }
+    })
+
+    return mergedData as SkinItem[]
+    // return sortSkinByRarity(mergedSkins)
+  }, [allSkins, selectedCase, dbSkins])
 
   const filteredSkins = useMemo(
     () =>
       showKnifesAndGloves
         ? skins
         : skins?.filter((s) => {
-            if (['Extraordinary', 'Covert'].includes(s.rarity)) {
-              if (ignoredCovertGunSkins.includes(s.weapon)) {
-                return true
-              }
+            if (s.weapon_type === 'Knife' || s.type === 'Gloves') {
               return false
             }
             return true
@@ -62,28 +65,36 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
     [showKnifesAndGloves, skins]
   )
 
-  const getRandomSkin = () => {
-    if (!skins) return
+  const getRandomSkin = (): SkinItem => {
     const random = Math.random()
     const ODDS = realOdds ? REAL_ODDS : FUN_ODDS
     const index = ODDS.findIndex((odd) => random >= odd[0] && random <= odd[1])
     const rarityNames = ODDS_GRADES[index]
     const _filteredSkins = skins.filter((s) => rarityNames.includes(s.rarity))
-    return _filteredSkins[Math.floor(Math.random() * _filteredSkins.length)]
+    const skin = _filteredSkins[Math.floor(Math.random() * _filteredSkins.length)]
+    if (!skin?.name || !skin?.image) {
+      return getRandomSkin()
+    }
+    return skin
   }
 
   const handleOpenCase = () => {
-    const randomSkin = getRandomSkin()
-    const randomSkins = Array.from({ length: realOdds ? 100 : 150 }, () => {
+    const _wonSkin = getRandomSkin()
+    const _sliderSkins = Array.from({ length: 74 }, () => {
       return getRandomSkin()
     }).filter((skin) => {
-      if (!skin?.name || !randomSkin?.name || !skin?.image || !randomSkin?.image) return false
-      return skin.name !== randomSkin.name && !['Extraordinary', 'Covert', 'Classified'].includes(skin.rarity)
+      return skin.name !== _wonSkin.name && !['Extraordinary', 'Covert', 'Classified'].includes(skin.rarity)
     })
-    randomSkins.length = 74
-    randomSkins[61] = randomSkin
-    setSliderSkins(randomSkins as Skin[])
-    setWonSkin(randomSkin)
+    while (_sliderSkins.length < 74) {
+      const skin = getRandomSkin()
+      if (skin.name === _wonSkin.name || ['Extraordinary', 'Covert', 'Classified'].includes(skin.rarity)) {
+        continue
+      }
+      _sliderSkins.push(skin)
+    }
+    _sliderSkins[61] = _wonSkin
+    setSliderSkins(_sliderSkins as SkinItem[])
+    setWonSkin(_wonSkin)
     setAnimating(true)
   }
 
@@ -110,7 +121,7 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
         addInventoryItem(wonSkin)
         setAnimating(false)
         toast(
-          <div className={`flex items-center p-1 gap-5 border-${GRADE_COLORS[wonSkin.rarity]}-500 border-b-4`}>
+          <div className={`flex items-center p-1 gap-5 border-b-4`} style={{ borderColor: `#${wonSkin?.rarity_color}` }}>
             <Image
               priority
               width={200}
@@ -137,7 +148,6 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
 
   return selectedCase ? (
     <section className="w-full max-w-6xl mx-auto">
-      {/* <ToastItemQueue /> */}
       <div className="hidden sm:block">
         <ToastContainer
           position="top-right"
@@ -197,19 +207,17 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
           <div className="relative h-[159px] w-[62.5rem] overflow-hidden">
             <div className="absolute top-0 left-[50%] z-10 w-0.5 h-full bg-yellow-400"></div>
             <div ref={sliderElement} className="absolute left-0 top-0 flex gap-3 translate-x-[-80%]">
-              {sliderSkins.map((skin, i) => (
-                <div key={i}>
-                  <Image
-                    priority
-                    width={300}
-                    height={300}
-                    src={skin?.image ?? '/images/placeholder.webp'}
-                    className={`border-${
-                      GRADE_COLORS[skin?.rarity]
-                    }-500 border-b-8 bg-zinc-700 p-4  min-w-[12rem] rounded-sm`}
-                    alt=""
-                  />
-                </div>
+              {sliderSkins?.map((skin, i) => (
+                <Image
+                  key={i}
+                  priority
+                  width={300}
+                  height={300}
+                  src={skin?.image ?? '/images/placeholder.webp'}
+                  style={{ borderColor: `#${skin?.rarity_color}` }}
+                  className={`border-b-8 bg-zinc-700 p-4 min-w-[12rem] rounded-sm`}
+                  alt=""
+                />
               ))}
             </div>
           </div>
@@ -217,14 +225,16 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
       )}
 
       <div className="flex flex-col">
-        <button
-          className="px-2.5 py-1 mx-auto mt-3 rounded w-fit bg-zinc-700"
-          onClick={() => {
-            setShowKnifesAndGloves((prev) => !prev)
-          }}
-        >
-          {showKnifesAndGloves ? 'Hide' : 'Show'} knifes and gloves
-        </button>
+        {!selectedCase.name.includes('Souvenir') && (
+          <button
+            className="px-2.5 py-1 mx-auto mt-3 rounded w-fit bg-zinc-700"
+            onClick={() => {
+              setShowKnifesAndGloves((prev) => !prev)
+            }}
+          >
+            {showKnifesAndGloves ? 'Hide' : 'Show'} knifes and gloves
+          </button>
+        )}
         <div id="skins" className="p-6 mt-4 rounded gap-x-6 gap-y-4 bg-zinc-800 responsiveGrid">
           {filteredSkins?.map((skin, i: number) => (
             <div key={i}>
@@ -234,7 +244,8 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
                 height={300}
                 src={skin?.image ?? '/images/placeholder.webp'}
                 alt=""
-                className={` ${GRADE_COLORS_BORDER[skin.rarity]} border-l-4 bg-zinc-700 p-4 rounded`}
+                style={{ borderColor: `#${skin?.rarity_color}` }}
+                className={` border-l-4 bg-zinc-700 p-4 rounded-sm`}
               />
               <p className={`mt-2 text-xs text-center`}>{skin.name}</p>
             </div>

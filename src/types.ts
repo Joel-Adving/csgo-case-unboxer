@@ -44,3 +44,40 @@ export type Collection = {
   name: string
   image: string
 }
+
+export type SkinItem = {
+  id: number
+  name: string
+  marketable: number
+  tradable: number
+  classid: string
+  icon_url?: string
+  icon_url_large?: string
+  type: string
+  weapon_type: string
+  gun_type?: string
+  souvenir?: number
+  tournament?: string
+  exterior?: string
+  rarity: string
+  rarity_color: string
+  price: string
+  first_sale_date?: string
+  knife_type?: string
+  image?: string
+}
+
+export type SkinPrice = {
+  '7_days'?: SkinPricePeriod
+  '30_days'?: SkinPricePeriod
+  all_time?: SkinPricePeriod
+}
+
+export type SkinPricePeriod = {
+  average: number
+  median: number
+  sold: string
+  standard_deviation: string
+  lowest_price: number
+  highest_price: number
+}

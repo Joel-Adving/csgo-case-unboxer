@@ -1,10 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../store'
-import { Skin } from '@/types'
+import { SkinItem } from '@/types'
+import { useCallback } from 'react'
 
 export type InventoryType = {
-  items: Skin[]
+  items: SkinItem[]
   show: boolean
 }
 
@@ -38,21 +39,35 @@ export const inventorySlice = createSlice({
   }
 })
 
-export const { addInventoryItem, removeInventoryItem, clearInventory, setShowInventory, toggleInventory, setInventory } =
-  inventorySlice.actions
 export default inventorySlice.reducer
 
 export const useInventory = () => {
   const dispatch = useDispatch()
   const inventory = useSelector((state: RootState) => state.inventory)
 
+  const clearInventory = useCallback(() => dispatch(inventorySlice.actions.clearInventory()), [dispatch])
+  const toggleInventory = useCallback(() => dispatch(inventorySlice.actions.toggleInventory()), [dispatch])
+  const setInventory = useCallback((items: SkinItem[]) => dispatch(inventorySlice.actions.setInventory(items)), [dispatch])
+  const addInventoryItem = useCallback(
+    (item: SkinItem) => dispatch(inventorySlice.actions.addInventoryItem(item)),
+    [dispatch]
+  )
+  const setShowInventory = useCallback(
+    (show: boolean) => dispatch(inventorySlice.actions.setShowInventory(show)),
+    [dispatch]
+  )
+  const removeInventoryItem = useCallback(
+    (id: string) => dispatch(inventorySlice.actions.removeInventoryItem(id)),
+    [dispatch]
+  )
+
   return {
     inventory,
-    setInventory: (items: Skin[]) => dispatch(setInventory(items)),
-    addInventoryItem: (item: any) => dispatch(addInventoryItem(item)),
-    removeInventoryItem: (id: string) => dispatch(removeInventoryItem(id)),
-    clearInventory: () => dispatch(clearInventory()),
-    setShowInventory: (show: boolean) => dispatch(setShowInventory(show)),
-    toggleInventory: () => dispatch(toggleInventory())
+    setInventory,
+    addInventoryItem,
+    removeInventoryItem,
+    clearInventory,
+    setShowInventory,
+    toggleInventory
   }
 }
