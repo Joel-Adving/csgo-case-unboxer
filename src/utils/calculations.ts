@@ -1,4 +1,3 @@
-import { SkinItem } from '@/types'
 import { FUN_RARITY_PERCENTAGES, RARITY, REAL_RARITY_PERCENTAGES } from '@/utils/constants'
 
 export type Rarity = typeof REAL_RARITY_PERCENTAGES | typeof FUN_RARITY_PERCENTAGES
@@ -19,16 +18,5 @@ export function rarityDiceRoll(percentages: Rarity) {
       return RARITY.exceedinglyRare
     default:
       return RARITY.rare
-  }
-}
-
-export const filterSkin = (skin: SkinItem, _wonSkin: SkinItem) => {
-  if (
-    skin.name !== _wonSkin.name &&
-    skin.type !== 'Gloves' &&
-    skin.weapon_type !== 'Knife' &&
-    skin.rarity !== 'Classified'
-  ) {
-    return true
   }
 }

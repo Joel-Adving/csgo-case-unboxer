@@ -8,8 +8,9 @@ import { useInventory } from '@/redux/slices/inventorySlice'
 import { useGetDbSkinsQuery } from '@/redux/services/api'
 import { Skin, SkinItem } from '@/types'
 import { ToastContainer, toast } from 'react-toastify'
-import { Rarity, filterSkin, rarityDiceRoll } from '@/utils/helpers'
 import 'react-toastify/dist/ReactToastify.css'
+import { Rarity, rarityDiceRoll } from '@/utils/calculations'
+import { filterSkinForSlider } from '@/utils/filtering'
 
 export default function CaseIdPage({ params }: { params: { id: string } }) {
   const [wonSkin, setWonSkin] = useState<SkinItem | null>()
@@ -81,11 +82,11 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
   const handleOpenCase = () => {
     const _wonSkin = getRandomSkin(realRarity ? REAL_RARITY_PERCENTAGES : FUN_RARITY_PERCENTAGES)
     const _sliderSkins = Array.from({ length: 74 }, () => getRandomSkin(REAL_RARITY_PERCENTAGES)).filter((skin) => {
-      return filterSkin(skin, _wonSkin)
+      return filterSkinForSlider(skin, _wonSkin)
     })
     while (_sliderSkins.length < 74) {
       const skin = getRandomSkin(REAL_RARITY_PERCENTAGES)
-      if (filterSkin(skin, _wonSkin)) {
+      if (filterSkinForSlider(skin, _wonSkin)) {
         _sliderSkins.push(skin)
       }
     }
