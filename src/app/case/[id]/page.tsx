@@ -2,12 +2,13 @@
 
 import Image from 'next/image'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { FUN_ODDS, ODDS_GRADES, REAL_ODDS } from '@/utils/constants'
+import { FUN_RARITY_PERCENTAGES, REAL_RARITY_PERCENTAGES } from '@/utils/constants'
 import { useGetCasesQuery, useGetSkinsQuery, useGetSouvenirsQuery } from '@/redux/services/csgoApi'
 import { useInventory } from '@/redux/slices/inventorySlice'
 import { useGetDbSkinsQuery } from '@/redux/services/api'
 import { Skin, SkinItem } from '@/types'
 import { ToastContainer, toast } from 'react-toastify'
+import { Rarity, filterSkin, rarityDiceRoll } from '@/utils/helpers'
 import 'react-toastify/dist/ReactToastify.css'
 
 export default function CaseIdPage({ params }: { params: { id: string } }) {
@@ -16,7 +17,7 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
   const [animating, setAnimating] = useState(false)
   const [fastMode, setFastMode] = useState(false)
   const [showKnifesAndGloves, setShowKnifesAndGloves] = useState(false)
-  const [realOdds, setRealOdds] = useState(true)
+  const [realRarity, setRealRarity] = useState(true)
 
   const sliderElement = useRef<HTMLDivElement>(null)
 
@@ -33,12 +34,10 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
 
   const skins = useMemo(() => {
     if (!selectedCase || !allSkins || !dbSkins) return []
-
     const contains = [...selectedCase.contains, ...selectedCase.contains_rare]
     const skins = Array.from(
       new Set(contains.map((skin) => allSkins.find((s) => s.name === skin.name)).filter((s) => s !== undefined))
     ) as Skin[]
-
     const mergedData = skins.map((skin) => {
       const _skin = dbSkins.find((s) => s.name.includes(skin.name))
       return {
@@ -47,9 +46,7 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
         image: skin?.image
       }
     })
-
     return mergedData as SkinItem[]
-    // return sortSkinByRarity(mergedSkins)
   }, [allSkins, selectedCase, dbSkins])
 
   const filteredSkins = useMemo(
@@ -65,32 +62,32 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
     [showKnifesAndGloves, skins]
   )
 
-  const getRandomSkin = (): SkinItem => {
-    const random = Math.random()
-    const ODDS = realOdds ? REAL_ODDS : FUN_ODDS
-    const index = ODDS.findIndex((odd) => random >= odd[0] && random <= odd[1])
-    const rarityNames = ODDS_GRADES[index]
-    const _filteredSkins = skins.filter((s) => rarityNames.includes(s.rarity))
+  const getRandomSkin = (percentages: Rarity): SkinItem => {
+    const rarity = rarityDiceRoll(percentages)
+    const _filteredSkins = skins.filter((s) => {
+      if (rarity.some((r) => r === s.type || r === s.weapon_type)) {
+        return true
+      } else if (rarity.some((r) => r === s.rarity && s.type !== 'Gloves' && s.weapon_type !== 'Knife')) {
+        return true
+      }
+    })
     const skin = _filteredSkins[Math.floor(Math.random() * _filteredSkins.length)]
     if (!skin?.name || !skin?.image) {
-      return getRandomSkin()
+      return getRandomSkin(REAL_RARITY_PERCENTAGES)
     }
     return skin
   }
 
   const handleOpenCase = () => {
-    const _wonSkin = getRandomSkin()
-    const _sliderSkins = Array.from({ length: 74 }, () => {
-      return getRandomSkin()
-    }).filter((skin) => {
-      return skin.name !== _wonSkin.name && !['Extraordinary', 'Covert', 'Classified'].includes(skin.rarity)
+    const _wonSkin = getRandomSkin(realRarity ? REAL_RARITY_PERCENTAGES : FUN_RARITY_PERCENTAGES)
+    const _sliderSkins = Array.from({ length: 74 }, () => getRandomSkin(REAL_RARITY_PERCENTAGES)).filter((skin) => {
+      return filterSkin(skin, _wonSkin)
     })
     while (_sliderSkins.length < 74) {
-      const skin = getRandomSkin()
-      if (skin.name === _wonSkin.name || ['Extraordinary', 'Covert', 'Classified'].includes(skin.rarity)) {
-        continue
+      const skin = getRandomSkin(REAL_RARITY_PERCENTAGES)
+      if (filterSkin(skin, _wonSkin)) {
+        _sliderSkins.push(skin)
       }
-      _sliderSkins.push(skin)
     }
     _sliderSkins[61] = _wonSkin
     setSliderSkins(_sliderSkins as SkinItem[])
@@ -100,28 +97,20 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     if (!animating || !sliderElement.current) return
-    sliderElement.current?.animate(
-      [
-        {
-          transform: ' translateX(0%)'
-        },
-        {
-          transform: 'translateX(-80%)'
-        }
-      ],
-      {
-        duration: fastMode ? 600 : 4500,
-        iterations: 1,
-        easing: 'cubic-bezier( 0.29, 0.8, 0.55, 0.99 )'
-      }
-    )
+
+    sliderElement.current?.animate([{ transform: ' translateX(0%)' }, { transform: 'translateX(-80%)' }], {
+      duration: fastMode ? 600 : 4500,
+      iterations: 1,
+      easing: 'cubic-bezier( 0.29, 0.8, 0.55, 0.99 )'
+    })
+
     const timeout = setTimeout(
       () => {
         if (!wonSkin) return
         addInventoryItem(wonSkin)
         setAnimating(false)
         toast(
-          <div className={`flex items-center p-1 gap-5 border-b-4`} style={{ borderColor: `#${wonSkin?.rarity_color}` }}>
+          <div className={`flex items-center p-1 gap-6 border-b-4`} style={{ borderColor: `#${wonSkin?.rarity_color}` }}>
             <Image
               priority
               width={200}
@@ -130,7 +119,7 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
               alt=""
               className={`w-[5rem] mb-2`}
             />
-            <p className="text-xs text-center text-gray-300">{wonSkin.name}</p>
+            <p className="text-xs text-center text-zinc-300">{wonSkin.name}</p>
           </div>,
           {
             style: {
@@ -168,44 +157,25 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
       </div>
 
       <div className="flex flex-col">
-        <p className="mt-2 mb-3 text-lg font-bold text-center sm:text-2xl">{selectedCase.name}</p>
-        <Image
-          width={300}
-          height={300}
-          priority
-          src={selectedCase.image}
-          className="sm:max-w-[12rem] w-full max-w-[8rem]  mx-auto"
-          alt=""
-        />
-        <div className="flex gap-4 mx-auto mt-2 text-xl w-fit">
-          <button
-            disabled={animating}
-            className="px-4 py-1 mx-auto mt-2 mb-1 bg-green-400 rounded w-fit text-gray-950"
-            onClick={handleOpenCase}
-          >
+        <p className="mb-1 text-2xl text-center">{selectedCase.name}</p>
+        <Image width={300} height={300} priority src={selectedCase.image} className="max-w-[8rem] w-full  mx-auto" alt="" />
+        <div className="flex gap-3 mx-auto mt-2 mb-1 w-fit">
+          <button disabled={animating} className="bg-green-400 btn text-zinc-950" onClick={handleOpenCase}>
             Open case
           </button>
-          <button
-            disabled={animating}
-            className="px-4 py-1 mx-auto mt-2 mb-1 text-gray-300 bg-gray-600 rounded w-fit"
-            onClick={() => setFastMode((prev) => !prev)}
-          >
+          <button disabled={animating} className="btn bg-zinc-600" onClick={() => setFastMode((prev) => !prev)}>
             {fastMode ? '5x Speed' : '1x Speed'}
           </button>
-          <button
-            disabled={animating}
-            className="px-4 py-1 mx-auto mt-2 mb-1 text-gray-300 bg-gray-600 rounded w-fit"
-            onClick={() => setRealOdds((prev) => !prev)}
-          >
-            {realOdds ? 'Real odds' : 'Fun odds'}
+          <button disabled={animating} className="btn bg-zinc-600" onClick={() => setRealRarity((prev) => !prev)}>
+            {realRarity ? 'Normal' : 'High'} %
           </button>
         </div>
       </div>
 
       {sliderSkins && (
-        <div className="grid h-[40vh] mb-[30vh] place-content-center overflow-hidden">
+        <div className="grid h-[40dvh] mb-[30dvh] place-content-center overflow-hidden">
           <div className="relative h-[159px] w-[62.5rem] overflow-hidden">
-            <div className="absolute top-0 left-[50%] z-10 w-0.5 h-full bg-yellow-400"></div>
+            <div className="absolute top-0 z-10 left-[50%] w-0.5 h-full bg-yellow-400"></div>
             <div ref={sliderElement} className="absolute left-0 top-0 flex gap-3 translate-x-[-80%]">
               {sliderSkins?.map((skin, i) => (
                 <Image
@@ -227,7 +197,7 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
       <div className="flex flex-col">
         {!selectedCase.name.includes('Souvenir') && (
           <button
-            className="px-2.5 py-1 mx-auto mt-3 rounded w-fit bg-zinc-700"
+            className="mx-auto mt-3 mb-1 rounded btn bg-zinc-700"
             onClick={() => {
               setShowKnifesAndGloves((prev) => !prev)
             }}
@@ -235,7 +205,7 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
             {showKnifesAndGloves ? 'Hide' : 'Show'} knifes and gloves
           </button>
         )}
-        <div id="skins" className="p-6 mt-4 rounded gap-x-6 gap-y-4 bg-zinc-800 responsiveGrid">
+        <div id="skins" className="p-3 mt-3 rounded gap-x-3 gap-y-4 bg-zinc-800 responsive-grid">
           {filteredSkins?.map((skin, i: number) => (
             <div key={i}>
               <Image
@@ -245,7 +215,7 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
                 src={skin?.image ?? '/images/placeholder.webp'}
                 alt=""
                 style={{ borderColor: `#${skin?.rarity_color}` }}
-                className={` border-l-4 bg-zinc-700 p-4 rounded-sm`}
+                className={`border-l-4 bg-zinc-700 p-4 rounded-sm`}
               />
               <p className={`mt-2 text-xs text-center`}>{skin.name}</p>
             </div>

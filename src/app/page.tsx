@@ -3,9 +3,10 @@ import Link from 'next/link'
 
 export default function Home() {
   return (
-    <main className="relative grid w-full max-w-5xl min-h-[90vh] p-3 mx-auto place-items-center">
-      <div className="flex flex-col gap-4 text-3xl sm:gap-20 font-extralight sm:flex-row">
-        <Link className="flex flex-col items-center transition-transform duration-75 hover:scale-105" href="/case">
+    <main className="grid min-h-[80dvh] place-items-center">
+      <div className="flex flex-col gap-16 text-2xl sm:gap-28 font-extralight sm:flex-row">
+        <Link className="flex flex-col items-center gap-3 transition-transform duration-75 hover:scale-105" href="/case">
+          <p>Cases</p>
           <Image
             priority
             style={{
@@ -16,9 +17,9 @@ export default function Home() {
             src="/images/case.webp"
             alt=""
           ></Image>
-          Cases
         </Link>
-        <Link className="flex flex-col items-center transition-transform duration-75 hover:scale-105" href="/souvenir">
+        <Link className="flex flex-col items-center gap-3 transition-transform duration-75 hover:scale-105" href="/souvenir">
+          <p>Souvenirs</p>
           <Image
             priority
             style={{
@@ -29,7 +30,6 @@ export default function Home() {
             src="/images/souvenir.webp"
             alt=""
           ></Image>
-          Souvenirs
         </Link>
       </div>
     </main>

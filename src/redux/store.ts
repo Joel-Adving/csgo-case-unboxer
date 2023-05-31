@@ -1,4 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit'
+import modalReducer from './slices/modalSlice'
 import inventoryReducer from './slices/inventorySlice'
 import { setupListeners } from '@reduxjs/toolkit/dist/query'
 import { api } from './services/api'
@@ -6,6 +7,7 @@ import { csgoApi } from './services/csgoApi'
 
 export const store = configureStore({
   reducer: {
+    modal: modalReducer,
     inventory: inventoryReducer,
     [api.reducerPath]: api.reducer,
     [csgoApi.reducerPath]: csgoApi.reducer

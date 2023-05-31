@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 export default function Grid({ cases }: { cases: Case[] }) {
   return (
-    <div className="grid gap-5 responsiveGrid p-[8vh]">
+    <div className="gap-6 responsive-grid">
       {cases
         ?.slice()
         ?.reverse()

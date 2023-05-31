@@ -15,10 +15,7 @@ const nextConfig = {
     ],
     minimumCacheTTL: 2592000 // 30 days
   },
-  output: 'standalone',
-  api: {
-    responseLimit: false
-  }
+  output: 'standalone'
 }
 
 module.exports = nextConfig
