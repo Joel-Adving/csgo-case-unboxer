@@ -29,6 +29,12 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
 
   const { addInventoryItem } = useInventory()
 
+  useEffect(() => {
+    fetch('/api/skins')
+      .then((res) => res.json())
+      .then(console.log)
+  }, [])
+
   const selectedCase = useMemo(() => {
     return cases?.find((c) => c.id === params.id) ?? souvenirs?.find((c) => c.id === params.id)
   }, [cases, params.id, souvenirs])

@@ -9,10 +9,10 @@ export const REAL_RARITY_PERCENTAGES = {
 } as const
 
 export const FUN_RARITY_PERCENTAGES = {
-  rare: 0.1,
+  rare: 0.05,
   mythical: 0.1,
-  legendary: 0.3,
-  ancient: 0.35,
+  legendary: 0.4,
+  ancient: 0.3,
   exceedinglyRare: 0.15
 } as const
 

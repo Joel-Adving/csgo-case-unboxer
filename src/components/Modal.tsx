@@ -6,7 +6,6 @@ import cn from 'classnames'
 import { ModalName, closeModal, useModal } from '@/redux/slices/modalSlice'
 import useOnClickOutside from '@/hooks/useClickOutside'
 import useEventListener from '@/hooks/useEventListener'
-import useWindowSize from '@/hooks/useWindowSize'
 
 type ModalProps = {
   targetModal: ModalName
@@ -49,7 +48,6 @@ const Modal = ({
   const [mounted, setMounted] = useState(false)
   const { selectModal } = useModal()
   const selectedModal = selectModal(targetModal)
-  const { width } = useWindowSize()
 
   const ref = useRef(null)
 
