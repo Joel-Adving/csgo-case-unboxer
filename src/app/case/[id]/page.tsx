@@ -34,8 +34,14 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
 
   const skins = useMemo(() => {
     if (!selectedCase || !allSkins) return []
-    return [...selectedCase.contains, ...selectedCase.contains_rare]
-      .map((skin) => allSkins.find((s) => s.name === skin.name))
+    const rares = selectedCase.contains_rare
+    return [
+      ...selectedCase.contains,
+      ...Array.from(new Set(rares.map((item) => item.name))).map((name) => {
+        return rares.find((item) => item.name === name)
+      })
+    ]
+      .map((skin) => allSkins.find((s) => s.name === skin?.name))
       .filter((s) => s !== undefined) as Skin[]
   }, [allSkins, selectedCase])
 

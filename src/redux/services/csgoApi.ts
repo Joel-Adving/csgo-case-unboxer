@@ -11,8 +11,11 @@ export const csgoApi = createApi({
     }),
     getSouvenirs: builder.query<Case[], null>({
       query: () => '/crates/souvenir.json'
+    }),
+    getCsgoApiSkins: builder.query<any[], null>({
+      query: () => '/skins.json'
     })
   })
 })
 
-export const { useGetCasesQuery, useGetSouvenirsQuery } = csgoApi
+export const { useGetCasesQuery, useGetSouvenirsQuery, useGetCsgoApiSkinsQuery } = csgoApi
