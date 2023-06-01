@@ -19,61 +19,37 @@ export type Case = {
 }
 
 export type Skin = {
-  id: string
-  name: string
-  description: string
-  weapon: string
-  pattern: string
-  min_float: number
-  max_float: number
-  rarity: GradeType
-  stattrak: boolean
-  image: string
-}
-
-export type Sticker = {
-  id: string
-  name: string
-  description: string
-  rarity: GradeType
-  image: string
-}
-
-export type Collection = {
-  id: string
-  name: string
-  image: string
-}
-
-export type SkinItem = {
   id: number
   name: string
-  marketable: number
-  tradable: number
   classid: string
-  icon_url?: string
-  icon_url_large?: string
   type: string
   weapon_type: string
-  gun_type?: string
-  souvenir?: number
-  tournament?: string
-  exterior?: string
+  gun_type: string
   rarity: string
   rarity_color: string
-  price: string
-  first_sale_date?: string
-  knife_type?: string
-  image?: string
+  prices: SkinPrices
+  first_sale_date: string
+  knife_type: string
+  image: string
+  skinId: string
+  min_float: number
+  max_float: number
+  stattrak: boolean
 }
 
-export type SkinPrice = {
-  '7_days'?: SkinPricePeriod
-  '30_days'?: SkinPricePeriod
-  all_time?: SkinPricePeriod
+type Ware = 'Factory New' | 'Minimal Wear' | 'Field-Tested' | 'Well-Worn' | 'Battle-Scarred'
+
+type SkinPrices = {
+  [key in Ware]?: SkinPricePeriod
 }
 
-export type SkinPricePeriod = {
+type SkinPricePeriod = {
+  '7_days'?: SkinPriceData
+  '30_days'?: SkinPriceData
+  all_time?: SkinPriceData
+}
+
+type SkinPriceData = {
   average: number
   median: number
   sold: string

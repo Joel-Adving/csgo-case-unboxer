@@ -1,11 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../store'
-import { SkinItem } from '@/types'
+import { Skin } from '@/types'
 import { useCallback } from 'react'
 
 export type InventoryType = {
-  items: SkinItem[]
+  items: Skin[]
   show: boolean
 }
 
@@ -47,11 +47,8 @@ export const useInventory = () => {
 
   const clearInventory = useCallback(() => dispatch(inventorySlice.actions.clearInventory()), [dispatch])
   const toggleInventory = useCallback(() => dispatch(inventorySlice.actions.toggleInventory()), [dispatch])
-  const setInventory = useCallback((items: SkinItem[]) => dispatch(inventorySlice.actions.setInventory(items)), [dispatch])
-  const addInventoryItem = useCallback(
-    (item: SkinItem) => dispatch(inventorySlice.actions.addInventoryItem(item)),
-    [dispatch]
-  )
+  const setInventory = useCallback((items: Skin[]) => dispatch(inventorySlice.actions.setInventory(items)), [dispatch])
+  const addInventoryItem = useCallback((item: Skin) => dispatch(inventorySlice.actions.addInventoryItem(item)), [dispatch])
   const setShowInventory = useCallback(
     (show: boolean) => dispatch(inventorySlice.actions.setShowInventory(show)),
     [dispatch]

@@ -11,22 +11,20 @@ datasource db {
 }
 
 model Skin {
-    id              Int     @id @default(autoincrement())
-    name            String  @unique
-    marketable      Int?
-    tradable        Int?
-    classid         String  @unique
-    icon_url        String?
-    icon_url_large  String?
-    type            String
-    souvenir        Int?
-    tournament      String?
+    id              Int      @id @default(autoincrement())
+    name            String?  @unique
+    classid         String?  @unique
+    type            String?
     weapon_type     String?
     gun_type        String?
-    exterior        String?
     rarity          String?
     rarity_color    String?
-    price           Json?
+    prices          Json?
     first_sale_date String?
     knife_type      String?
+    image           String?
+    skinId          String?
+    min_float       Float?
+    max_float       Float?
+    stattrak        Boolean?
 }

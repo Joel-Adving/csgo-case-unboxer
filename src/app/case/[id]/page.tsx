@@ -3,18 +3,18 @@
 import Image from 'next/image'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { FUN_RARITY_PERCENTAGES, REAL_RARITY_PERCENTAGES } from '@/utils/constants'
-import { useGetCasesQuery, useGetSkinsQuery, useGetSouvenirsQuery } from '@/redux/services/csgoApi'
+import { useGetCasesQuery, useGetSouvenirsQuery } from '@/redux/services/csgoApi'
 import { useInventory } from '@/redux/slices/inventorySlice'
-import { useGetDbSkinsQuery } from '@/redux/services/api'
-import { Skin, SkinItem } from '@/types'
+import { Skin } from '@/types'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { Rarity, rarityDiceRoll } from '@/utils/calculations'
 import { filterSkinForSlider } from '@/utils/filtering'
+import { useGetSkinsQuery } from '@/redux/services/api'
 
 export default function CaseIdPage({ params }: { params: { id: string } }) {
-  const [wonSkin, setWonSkin] = useState<SkinItem | null>()
-  const [sliderSkins, setSliderSkins] = useState<SkinItem[] | null>(null)
+  const [wonSkin, setWonSkin] = useState<Skin | null>()
+  const [sliderSkins, setSliderSkins] = useState<Skin[] | null>(null)
   const [animating, setAnimating] = useState(false)
   const [fastMode, setFastMode] = useState(false)
   const [showKnifesAndGloves, setShowKnifesAndGloves] = useState(false)
@@ -22,39 +22,22 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
 
   const sliderElement = useRef<HTMLDivElement>(null)
 
+  const { addInventoryItem } = useInventory()
+
   const { data: allSkins } = useGetSkinsQuery(null)
   const { data: cases } = useGetCasesQuery(null)
   const { data: souvenirs } = useGetSouvenirsQuery(null)
-  const { data: dbSkins } = useGetDbSkinsQuery(null)
-
-  const { addInventoryItem } = useInventory()
-
-  useEffect(() => {
-    fetch('/api/skins')
-      .then((res) => res.json())
-      .then(console.log)
-  }, [])
 
   const selectedCase = useMemo(() => {
     return cases?.find((c) => c.id === params.id) ?? souvenirs?.find((c) => c.id === params.id)
   }, [cases, params.id, souvenirs])
 
   const skins = useMemo(() => {
-    if (!selectedCase || !allSkins || !dbSkins) return []
-    const contains = [...selectedCase.contains, ...selectedCase.contains_rare]
-    const skins = Array.from(
-      new Set(contains.map((skin) => allSkins.find((s) => s.name === skin.name)).filter((s) => s !== undefined))
-    ) as Skin[]
-    const mergedData = skins.map((skin) => {
-      const _skin = dbSkins.find((s) => s.name.includes(skin.name))
-      return {
-        ..._skin,
-        name: skin.name,
-        image: skin?.image
-      }
-    })
-    return mergedData as SkinItem[]
-  }, [allSkins, selectedCase, dbSkins])
+    if (!selectedCase || !allSkins) return []
+    return [...selectedCase.contains, ...selectedCase.contains_rare]
+      .map((skin) => allSkins.find((s) => s.name === skin.name))
+      .filter((s) => s !== undefined) as Skin[]
+  }, [allSkins, selectedCase])
 
   const filteredSkins = useMemo(
     () =>
@@ -69,7 +52,7 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
     [showKnifesAndGloves, skins]
   )
 
-  const getRandomSkin = (percentages: Rarity): SkinItem => {
+  const getRandomSkin = (percentages: Rarity): Skin => {
     const rarity = rarityDiceRoll(percentages)
     const _filteredSkins = skins.filter((s) => {
       if (rarity.some((r) => r === s.type || r === s.weapon_type)) {
@@ -97,7 +80,7 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
       }
     }
     _sliderSkins[61] = _wonSkin
-    setSliderSkins(_sliderSkins as SkinItem[])
+    setSliderSkins(_sliderSkins as Skin[])
     setWonSkin(_wonSkin)
     setAnimating(true)
   }
@@ -142,7 +125,7 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [animating, wonSkin, fastMode])
 
-  return selectedCase ? (
+  return selectedCase && filteredSkins.length > 0 ? (
     <section className="w-full max-w-6xl mx-auto">
       <div className="hidden sm:block">
         <ToastContainer
