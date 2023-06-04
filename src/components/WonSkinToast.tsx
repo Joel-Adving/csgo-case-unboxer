@@ -1,11 +1,12 @@
 import { Skin } from '@/types'
+import { getPrice } from '@/utils/balanceHelper'
 import Image from 'next/image'
 import React from 'react'
 import { toast } from 'react-toastify'
 
 export default function WonSkinToast({ skin }: { skin: Skin }) {
   return (
-    <div className={`flex items-center p-1 gap-6 border-b-4`} style={{ borderColor: `#${skin?.rarity_color}` }}>
+    <div className={`flex items-center gap-4 p-1 border-b-4`} style={{ borderColor: `#${skin?.rarity_color}` }}>
       <Image
         priority
         width={200}
@@ -14,7 +15,10 @@ export default function WonSkinToast({ skin }: { skin: Skin }) {
         alt=""
         className={`w-[5rem] mb-2`}
       />
-      <p className="text-xs text-center text-zinc-300">{skin.name}</p>
+      <div className="flex flex-col">
+        <p className="text-xs text-slate-300 ">{skin.name}</p>
+        <p className="text-lg text-green-400 whitespace-nowrap">{getPrice(skin)} €</p>
+      </div>
     </div>
   )
 }

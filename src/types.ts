@@ -24,9 +24,9 @@ type SkinPrices = {
 }
 
 type SkinPricePeriod = {
-  '7_days'?: SkinPriceData
-  '30_days'?: SkinPriceData
-  all_time?: SkinPriceData
+  '7_days': SkinPriceData
+  '30_days': SkinPriceData
+  all_time: SkinPriceData
 }
 
 type SkinPriceData = {

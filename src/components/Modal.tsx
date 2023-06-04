@@ -112,7 +112,7 @@ const Modal = ({
           <a.div
             ref={ref}
             style={modalSpring}
-            className={cn('relative w-full max-w-5xl z-100 overflow-auto rounded sm:max-h-[70dvh]', className)}
+            className={cn('relative w-full max-w-5xl z-100 overflow-auto rounded sm:max-h-[70vh]', className)}
           >
             {selectedModal?.visible && children}
           </a.div>

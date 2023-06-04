@@ -13,7 +13,6 @@ async function get<T>({
 }) {
   const res = await fetch(baseUrl + query)
   const data: T = await res.json()
-  console.log(data)
   if (!data) {
     throw new Error(error)
   }

@@ -1,14 +1,22 @@
 'use client'
 
 import Image from 'next/image'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useInventory } from '@/redux/slices/inventorySlice'
 import Modal from './Modal'
 import { useModal } from '@/redux/slices/modalSlice'
+import Button from './Button'
+import { getPrice } from '@/utils/balanceHelper'
 
 export default function Inventory() {
   const { inventory, clearInventory, setInventory } = useInventory()
   const { openModal, closeModal } = useModal()
+
+  const balance = useMemo(() => {
+    return inventory.items.reduce((acc, item) => {
+      return acc + getPrice(item)
+    }, 0)
+  }, [inventory.items])
 
   useEffect(() => {
     const localInventory = JSON.parse(localStorage.getItem('inventory') ?? '[]')
@@ -23,27 +31,32 @@ export default function Inventory() {
 
   return (
     <>
-      <button className={`btn border-zinc-500 border`} onClick={() => openModal('inventory')}>
+      <Button className={`btn border-slate-500 border`} onClick={() => openModal('inventory')}>
         Inventory
-      </button>
+      </Button>
 
       <Modal targetModal="inventory" scroll={false} allowClickOutside={true} allowClose={true}>
-        <div className="relative w-full h-screen sm:h-auto max-w-5xl p-3 sm:p-6 overflow-y-auto rounded sm:min-h-[50dvh] bg-zinc-800">
+        <div className="relative w-full h-screen sm:h-auto max-w-5xl p-3 sm:p-6 overflow-y-auto rounded sm:min-h-[50vh] bg-slate-800">
           <div className="flex-col w-full gap-2 pb-4 mx-auto sm:pb-6 whitespace-nowrap ">
             <div className="flex items-center w-full gap-3">
-              <p className="mr-auto text-xl">
-                <span className="text-3xl">{inventory.items.length}</span> items
-              </p>
+              <div className="flex gap-4 mr-auto">
+                <p className="text-xl">
+                  <span className="text-3xl">{inventory.items.length}</span> items
+                </p>
+                <p className="text-xl text-green-400">
+                  <span className="text-3xl">{balance.toFixed(2)}</span> €
+                </p>
+              </div>
 
               {inventory.items.length > 0 ? (
-                <button className="text-red-500 border border-red-500 btn" onClick={() => clearInventory()}>
-                  clear inventory
-                </button>
+                <Button className="text-red-500 border border-red-500 btn" onClick={() => clearInventory()}>
+                  Clean inventory
+                </Button>
               ) : null}
 
-              <button className="border btn border-zinc-500" onClick={() => closeModal('inventory')}>
+              <Button className="border btn border-slate-500" onClick={() => closeModal('inventory')}>
                 Close
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -59,7 +72,7 @@ export default function Inventory() {
                     src={skin?.image ?? '/images/placeholder.webp'}
                     alt=""
                     style={{ borderColor: `#${skin?.rarity_color}` }}
-                    className={`border-l-4 bg-zinc-700 p-3 rounded-sm`}
+                    className={`border-l-4 bg-slate-700 p-3 rounded-sm`}
                   />
                   <p className="text-xs text-center">{skin.name}</p>
                 </div>

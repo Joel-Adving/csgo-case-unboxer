@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 export default function Home() {
   return (
-    <main className="grid min-h-[80dvh] place-items-center">
+    <main className="grid min-h-[80vh] place-items-center">
       <div className="flex flex-col gap-16 text-2xl sm:gap-28 font-extralight sm:flex-row">
         <Link className="flex flex-col items-center gap-3 transition-transform duration-75 hover:scale-105" href="/case">
           <p>Cases</p>
