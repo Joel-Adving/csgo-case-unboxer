@@ -1,4 +1,6 @@
 import { prisma } from '@/libs/prisma'
+import { authorized } from '@/utils/serverFunctions'
+import { Skin } from '@prisma/client'
 import { NextResponse } from 'next/server'
 
 export type SkinRequestData = {
@@ -24,12 +26,6 @@ export type SkinRequestData = {
 const CSGO_BACKPACK_API = 'https://csgobackpack.net/api/GetItemsList/v2/'
 const BYMYKEL_API = 'https://bymykel.github.io/CSGO-API/api/en/skins.json'
 const excluded = ['StatTrak™', 'Sticker', 'Patch', 'Sealed Graffiti']
-
-const authorized = (request: Request) => {
-  const { searchParams } = new URL(request.url)
-  const token = searchParams.get('token')
-  return token && token === process.env.API_TOKEN
-}
 
 const combineGrades = (csgobackpackData: any) => {
   const combinedGrades = new Map()
@@ -75,16 +71,18 @@ const getSkinsData = async () => {
 
   const combinedGrades = combineGrades(csgobackpackData)
 
-  return combinedGrades.map((s) => {
-    const bymykelSkin = bymykelData.find((skin: any) => skin.name.replace(/(?:%27|&#39)/g, "'").includes(s.name))
-    if (!bymykelSkin) return s
-    s.image = bymykelSkin?.image
-    s.skinId = bymykelSkin?.id
-    s.min_float = bymykelSkin?.min_float
-    s.max_float = bymykelSkin?.max_float
-    s.stattrak = bymykelSkin?.stattrak
-    return s
-  })
+  return combinedGrades
+    .map((s) => {
+      const bymykelSkin = bymykelData.find((skin: any) => skin.name.replace(/(?:%27|&#39)/g, "'").includes(s.name))
+      if (!bymykelSkin) return null
+      s.image = bymykelSkin?.image
+      s.id = bymykelSkin?.id
+      s.min_float = bymykelSkin?.min_float
+      s.max_float = bymykelSkin?.max_float
+      s.stattrak = bymykelSkin?.stattrak
+      return s
+    })
+    .filter((s) => s !== null)
 }
 
 export async function GET() {
@@ -97,19 +95,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'unauthorized' })
   }
 
-  try {
-    const data = await getSkinsData()
-    const skins = []
-    for (let i = 0; i < data.length; i++) {
-      const skin = await prisma.skin.create({
-        data: data[i]
-      })
-      skins.push(skin)
+  const data = await getSkinsData()
+  const skins: Skin[] = []
+
+  for (let i = 0; i < data.length; i++) {
+    const skin = data[i]
+
+    if (skins.find((s) => s.id === skin.id || s.classid === skin.classid || s.name === skin.name)) {
+      continue
     }
-    return NextResponse.json(skins)
-  } catch (e) {
-    return NextResponse.json({ message: 'Something went wrong' })
+
+    const createdSkin = await prisma.skin.create({
+      data: skin
+    })
+
+    skins.push(createdSkin)
   }
+
+  return NextResponse.json(skins)
 }
 
 export async function PUT(request: Request) {
@@ -120,19 +123,16 @@ export async function PUT(request: Request) {
   const csgobackpackData = await fetch(CSGO_BACKPACK_API).then((res) => res.json())
   const skins = combineGrades(csgobackpackData)
 
-  try {
-    for (let i = 0; i < skins.length; i++) {
-      await prisma.skin.update({
-        where: {
-          classid: skins[i].classid
-        },
-        data: {
-          prices: skins[i].prices
-        }
-      })
-    }
-    return NextResponse.json({ message: 'success' })
-  } catch (e) {
-    return NextResponse.json({ message: 'Something went wrong' })
+  for (let i = 0; i < skins.length; i++) {
+    await prisma.skin.update({
+      where: {
+        classid: skins[i].classid
+      },
+      data: {
+        prices: skins[i].prices
+      }
+    })
   }
+
+  return NextResponse.json({ message: 'success' })
 }

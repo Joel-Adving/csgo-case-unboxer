@@ -11,8 +11,8 @@ datasource db {
 }
 
 model Skin {
-    id              Int      @id @default(autoincrement())
-    name            String?  @unique
+    id              String   @id @unique
+    name            String   @unique
     classid         String?  @unique
     type            String?
     weapon_type     String?
@@ -23,8 +23,17 @@ model Skin {
     first_sale_date String?
     knife_type      String?
     image           String?
-    skinId          String?
     min_float       Float?
     max_float       Float?
     stattrak        Boolean?
+    crates          Crate[]
+}
+
+model Crate {
+    id              String  @id @unique
+    name            String  @unique
+    type            String?
+    first_sale_date String?
+    image           String?
+    skins           Skin[]
 }

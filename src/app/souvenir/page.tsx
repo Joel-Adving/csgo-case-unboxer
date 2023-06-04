@@ -3,5 +3,5 @@ import { getSouvenirs } from '@/utils/serverFunctions'
 
 export default async function SouvenirPage() {
   const souvenirs = await getSouvenirs()
-  return <Grid cases={souvenirs} />
+  return <Grid crates={souvenirs} />
 }

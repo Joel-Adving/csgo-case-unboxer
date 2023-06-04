@@ -3,7 +3,7 @@ import modalReducer from './slices/modalSlice'
 import inventoryReducer from './slices/inventorySlice'
 import { setupListeners } from '@reduxjs/toolkit/dist/query'
 import { api } from './services/api'
-import { csgoApi } from './services/csgoApi'
+import { csgoApi } from './services/bymykelApi'
 
 export const store = configureStore({
   reducer: {

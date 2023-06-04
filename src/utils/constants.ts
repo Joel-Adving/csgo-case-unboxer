@@ -1,4 +1,4 @@
-export const API_URL = 'https://bymykel.github.io/CSGO-API/api/en/'
+export const BYMYKEL_API_URL = 'https://bymykel.github.io/CSGO-API/api/en/'
 
 export const REAL_RARITY_PERCENTAGES = {
   rare: 0.7992, // 79.92%
@@ -23,3 +23,13 @@ export const RARITY = {
   ancient: ['Covert', 'Extraordinary'],
   exceedinglyRare: ['Knife', 'Gloves', 'Contraband']
 }
+
+export const RARITY_INDEX = {
+  'Consumer Grade': 0,
+  'Industrial Grade': 1,
+  'Mil-Spec Grade': 2,
+  Restricted: 3,
+  Classified: 4,
+  Covert: 5,
+  Extraordinary: 6
+} as const

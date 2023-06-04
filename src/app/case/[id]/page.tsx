@@ -3,99 +3,47 @@
 import Image from 'next/image'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { FUN_RARITY_PERCENTAGES, REAL_RARITY_PERCENTAGES } from '@/utils/constants'
-import { useGetCasesQuery, useGetSouvenirsQuery } from '@/redux/services/csgoApi'
+import { getRandomSkin, getRaffleSkins } from '@/utils/raffleHelpers'
+import { useGetCrateSkinsQuery } from '@/redux/services/api'
 import { useInventory } from '@/redux/slices/inventorySlice'
+import { wonSkinToast } from '@/components/WonSkinToast'
+import ToastContainer from '@/components/ToastContainer'
 import { Skin } from '@/types'
-import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { Rarity, rarityDiceRoll } from '@/utils/calculations'
-import { filterSkinForSlider } from '@/utils/filtering'
-import { useGetSkinsQuery } from '@/redux/services/api'
+import { filterDisplayedSkins, raritySorter } from '@/utils/sortAndfilters'
+
+const FAST_MODE = 500
+const NORMAL_MODE = 4500
 
 export default function CaseIdPage({ params }: { params: { id: string } }) {
   const [wonSkin, setWonSkin] = useState<Skin | null>()
-  const [sliderSkins, setSliderSkins] = useState<Skin[] | null>(null)
-  const [animating, setAnimating] = useState(false)
   const [fastMode, setFastMode] = useState(false)
-  const [showKnifesAndGloves, setShowKnifesAndGloves] = useState(false)
+  const [animating, setAnimating] = useState(false)
   const [realRarity, setRealRarity] = useState(true)
+  const [raffleSkins, setRaffleSkins] = useState<Skin[] | null>(null)
+  const [showKnifesAndGloves, setShowKnifesAndGloves] = useState(false)
 
-  const sliderElement = useRef<HTMLDivElement>(null)
-
+  const raffleElement = useRef<HTMLDivElement>(null)
+  const { data: crate } = useGetCrateSkinsQuery(params.id)
   const { addInventoryItem } = useInventory()
 
-  const { data: allSkins } = useGetSkinsQuery(null)
-  const { data: cases } = useGetCasesQuery(null)
-  const { data: souvenirs } = useGetSouvenirsQuery(null)
-
-  const selectedCase = useMemo(() => {
-    return cases?.find((c) => c.id === params.id) ?? souvenirs?.find((c) => c.id === params.id)
-  }, [cases, params.id, souvenirs])
-
-  const skins = useMemo(() => {
-    if (!selectedCase || !allSkins) return []
-    const rares = selectedCase.contains_rare
-    return [
-      ...selectedCase.contains,
-      ...Array.from(new Set(rares.map((item) => item.name))).map((name) => {
-        return rares.find((item) => item.name === name)
-      })
-    ]
-      .map((skin) => allSkins.find((s) => s.name === skin?.name))
-      .filter((s) => s !== undefined) as Skin[]
-  }, [allSkins, selectedCase])
-
-  const filteredSkins = useMemo(
-    () =>
-      showKnifesAndGloves
-        ? skins
-        : skins?.filter((s) => {
-            if (s.weapon_type === 'Knife' || s.type === 'Gloves') {
-              return false
-            }
-            return true
-          }),
-    [showKnifesAndGloves, skins]
-  )
-
-  const getRandomSkin = (percentages: Rarity): Skin => {
-    const rarity = rarityDiceRoll(percentages)
-    const _filteredSkins = skins.filter((s) => {
-      if (rarity.some((r) => r === s.type || r === s.weapon_type)) {
-        return true
-      } else if (rarity.some((r) => r === s.rarity && s.type !== 'Gloves' && s.weapon_type !== 'Knife')) {
-        return true
-      }
-    })
-    const skin = _filteredSkins[Math.floor(Math.random() * _filteredSkins.length)]
-    if (!skin?.name || !skin?.image) {
-      return getRandomSkin(REAL_RARITY_PERCENTAGES)
-    }
-    return skin
-  }
+  const skins = useMemo(() => raritySorter(crate?.skins ?? []), [crate?.skins])
+  const displayedSkins = useMemo(() => filterDisplayedSkins(showKnifesAndGloves, skins), [skins, showKnifesAndGloves])
 
   const handleOpenCase = () => {
-    const _wonSkin = getRandomSkin(realRarity ? REAL_RARITY_PERCENTAGES : FUN_RARITY_PERCENTAGES)
-    const _sliderSkins = Array.from({ length: 74 }, () => getRandomSkin(REAL_RARITY_PERCENTAGES)).filter((skin) => {
-      return filterSkinForSlider(skin, _wonSkin)
-    })
-    while (_sliderSkins.length < 74) {
-      const skin = getRandomSkin(REAL_RARITY_PERCENTAGES)
-      if (filterSkinForSlider(skin, _wonSkin)) {
-        _sliderSkins.push(skin)
-      }
-    }
-    _sliderSkins[61] = _wonSkin
-    setSliderSkins(_sliderSkins as Skin[])
+    const _wonSkin = getRandomSkin(realRarity ? REAL_RARITY_PERCENTAGES : FUN_RARITY_PERCENTAGES, skins)
+    const _raffleSkins = getRaffleSkins(_wonSkin, skins)
+    _raffleSkins[61] = _wonSkin
+    setRaffleSkins(_raffleSkins)
     setWonSkin(_wonSkin)
     setAnimating(true)
   }
 
   useEffect(() => {
-    if (!animating || !sliderElement.current) return
+    if (!animating || !raffleElement.current) return
 
-    sliderElement.current?.animate([{ transform: ' translateX(0%)' }, { transform: 'translateX(-80%)' }], {
-      duration: fastMode ? 600 : 4500,
+    raffleElement.current?.animate([{ transform: ' translateX(0%)' }, { transform: 'translateX(-80%)' }], {
+      duration: fastMode ? FAST_MODE : NORMAL_MODE,
       iterations: 1,
       easing: 'cubic-bezier( 0.29, 0.8, 0.55, 0.99 )'
     })
@@ -105,56 +53,23 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
         if (!wonSkin) return
         addInventoryItem(wonSkin)
         setAnimating(false)
-        toast(
-          <div className={`flex items-center p-1 gap-6 border-b-4`} style={{ borderColor: `#${wonSkin?.rarity_color}` }}>
-            <Image
-              priority
-              width={200}
-              height={200}
-              src={wonSkin?.image ?? '/images/placeholder.webp'}
-              alt=""
-              className={`w-[5rem] mb-2`}
-            />
-            <p className="text-xs text-center text-zinc-300">{wonSkin.name}</p>
-          </div>,
-          {
-            style: {
-              backgroundColor: '#3F3F46',
-              width: '100%'
-            }
-          }
-        )
+        wonSkinToast(wonSkin)
       },
-      fastMode ? 600 : 4500
+      fastMode ? FAST_MODE : NORMAL_MODE
     )
-    return () => clearTimeout(timeout)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [animating, wonSkin, fastMode])
 
-  return selectedCase && filteredSkins.length > 0 ? (
+    return () => clearTimeout(timeout)
+  }, [animating, wonSkin, fastMode, addInventoryItem])
+
+  return crate && skins.length > 0 ? (
     <section className="w-full max-w-6xl mx-auto">
       <div className="hidden sm:block">
-        <ToastContainer
-          position="top-right"
-          autoClose={2500}
-          hideProgressBar
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="dark"
-          style={{
-            maxWidth: '17rem',
-            width: '100%'
-          }}
-        />
+        <ToastContainer />
       </div>
 
       <div className="flex flex-col">
-        <p className="mb-1 text-2xl text-center">{selectedCase.name}</p>
-        <Image width={300} height={300} priority src={selectedCase.image} className="max-w-[8rem] w-full  mx-auto" alt="" />
+        <p className="mb-1 text-2xl text-center">{crate.name}</p>
+        <Image width={300} height={300} priority src={crate.image} className="max-w-[8rem] w-full  mx-auto" alt="" />
         <div className="flex gap-3 mx-auto mt-2 mb-1 w-fit">
           <button disabled={animating} className="bg-green-400 btn text-zinc-950" onClick={handleOpenCase}>
             Open case
@@ -168,12 +83,12 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
         </div>
       </div>
 
-      {sliderSkins && (
+      {raffleSkins && (
         <div className="grid h-[40dvh] mb-[30dvh] place-content-center overflow-hidden">
           <div className="relative h-[159px] w-[62.5rem] overflow-hidden">
             <div className="absolute top-0 z-10 left-[50%] w-0.5 h-full bg-yellow-400"></div>
-            <div ref={sliderElement} className="absolute left-0 top-0 flex gap-3 translate-x-[-80%]">
-              {sliderSkins?.map((skin, i) => (
+            <div ref={raffleElement} className="absolute left-0 top-0 flex gap-3 translate-x-[-80%]">
+              {raffleSkins?.map((skin, i) => (
                 <Image
                   key={i}
                   priority
@@ -191,18 +106,16 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
       )}
 
       <div className="flex flex-col">
-        {!selectedCase.name.includes('Souvenir') && (
+        {!crate?.name?.includes('Souvenir') && (
           <button
             className="mx-auto mt-3 mb-1 rounded btn bg-zinc-700"
-            onClick={() => {
-              setShowKnifesAndGloves((prev) => !prev)
-            }}
+            onClick={() => setShowKnifesAndGloves((prev) => !prev)}
           >
             {showKnifesAndGloves ? 'Hide' : 'Show'} knifes and gloves
           </button>
         )}
         <div id="skins" className="p-3 mt-3 rounded gap-x-3 gap-y-4 bg-zinc-800 responsive-grid">
-          {filteredSkins?.map((skin, i: number) => (
+          {displayedSkins?.map((skin, i: number) => (
             <div key={i}>
               <Image
                 priority

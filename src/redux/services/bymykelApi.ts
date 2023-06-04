@@ -1,15 +1,14 @@
-import { Case } from '@/types'
-import { API_URL } from '@/utils/constants'
+import { BYMYKEL_API_URL } from '@/utils/constants'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const csgoApi = createApi({
   reducerPath: 'csgoApi',
-  baseQuery: fetchBaseQuery({ baseUrl: API_URL }),
+  baseQuery: fetchBaseQuery({ baseUrl: BYMYKEL_API_URL }),
   endpoints: (builder) => ({
-    getCases: builder.query<Case[], null>({
+    getBymykelCases: builder.query<any[], null>({
       query: () => '/crates/cases.json'
     }),
-    getSouvenirs: builder.query<Case[], null>({
+    getBymykelSouvenirs: builder.query<any[], null>({
       query: () => '/crates/souvenir.json'
     }),
     getCsgoApiSkins: builder.query<any[], null>({
@@ -18,4 +17,4 @@ export const csgoApi = createApi({
   })
 })
 
-export const { useGetCasesQuery, useGetSouvenirsQuery, useGetCsgoApiSkinsQuery } = csgoApi
+export const {} = csgoApi

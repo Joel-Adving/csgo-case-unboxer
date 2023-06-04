@@ -1,23 +1,3 @@
-type GradeType =
-  | 'Consumer'
-  | 'Industrial Grade'
-  | 'Mil-Spec Grade'
-  | 'Restricted'
-  | 'Classified'
-  | 'Covert'
-  | 'Extraordinary'
-
-export type Case = {
-  id: string
-  name: string
-  description: string
-  type: string
-  first_sale_date: string
-  contains: Skin[]
-  contains_rare: Skin[]
-  image: string
-}
-
 export type Skin = {
   id: number
   name: string
@@ -56,4 +36,24 @@ type SkinPriceData = {
   standard_deviation: string
   lowest_price: number
   highest_price: number
+}
+
+export type CrateType = {
+  id: string
+  name: string
+  type: string
+  skins?: Skin[]
+  first_sale_date: string
+  image: string
+}
+
+export type BymykelCrateType = {
+  id: string
+  name: string
+  description: string
+  type: string
+  first_sale_date: string
+  contains: any[]
+  contains_rare: any[]
+  image: string
 }

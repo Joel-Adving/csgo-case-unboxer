@@ -3,5 +3,5 @@ import { getCases } from '@/utils/serverFunctions'
 
 export default async function CasePage() {
   const cases = await getCases()
-  return <Grid cases={cases} />
+  return <Grid crates={cases} />
 }

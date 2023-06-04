@@ -1,25 +1,54 @@
-import { Case } from '@/types'
-import { API_URL } from '@/utils/constants'
+import { BymykelCrateType } from '@/types'
+import { BYMYKEL_API_URL } from '@/utils/constants'
+import { Crate } from '@prisma/client'
 
-async function get<T>({ query, error = 'Internal Server Error' }: { query: string; error?: string }) {
-  const res = await fetch(API_URL + query + '.json')
-  const cases: T = await res.json()
-  if (!cases) {
+async function get<T>({
+  query,
+  baseUrl = process.env.API_URL,
+  error = 'Internal Server Error'
+}: {
+  query: string
+  baseUrl?: string
+  error?: string
+}) {
+  const res = await fetch(baseUrl + query)
+  const data: T = await res.json()
+  console.log(data)
+  if (!data) {
     throw new Error(error)
   }
-  return cases
+  return data
 }
 
-export async function getCases() {
-  return get<Case[]>({
-    query: 'crates/cases',
-    error: 'Could not fetch cases'
+function getBymykelData<T>(query: string) {
+  return get<T>({
+    baseUrl: BYMYKEL_API_URL,
+    query: query + '.json'
   })
 }
 
-export async function getSouvenirs() {
-  return get<Case[]>({
-    query: 'crates/souvenir',
-    error: 'Could not fetch souvenirs'
+export function getBymykelCases() {
+  return getBymykelData<BymykelCrateType[]>('crates/cases')
+}
+
+export function getBymykelSouvenirs() {
+  return getBymykelData<BymykelCrateType[]>('crates/souvenir')
+}
+
+export function getCases() {
+  return get<Crate[]>({
+    query: 'crates/cases'
   })
+}
+
+export function getSouvenirs() {
+  return get<Crate[]>({
+    query: 'crates/souvenirs'
+  })
+}
+
+export function authorized(request: Request) {
+  const { searchParams } = new URL(request.url)
+  const token = searchParams.get('token')
+  return token && token === process.env.API_TOKEN
 }
