@@ -69,7 +69,7 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
         <Button disabled={animating} onClick={() => setFastMode((prev) => !prev)}>
           {fastMode ? '5x Speed' : '1x Speed'}
         </Button>
-        <Button onClick={() => setRealRarity((prev) => !prev)}>{realRarity ? 'Normal' : 'High'} chanse</Button>
+        <Button onClick={() => setRealRarity((prev) => !prev)}>{realRarity ? 'Normal' : 'High'} chance</Button>
         <Button onClick={() => setAutoSpin((prev) => !prev)}>{autoSpin ? 'Auto spin' : 'Manual'}</Button>
         <Button
           disabled={animating}
