@@ -62,3 +62,18 @@ export function getRaffleSkins(wonSkin: Skin, skins: Skin[]) {
   }
   return raffleSkins
 }
+
+export function getRarity(wonSkin: Skin) {
+  switch (true) {
+    case RARITY.rare.includes(wonSkin?.rarity ?? ''):
+      return 'rare'
+    case RARITY.mythical.includes(wonSkin?.rarity ?? ''):
+      return 'mythical'
+    case RARITY.legendary.includes(wonSkin?.rarity ?? ''):
+      return 'legendary'
+    case RARITY.ancient.includes(wonSkin?.rarity ?? ''):
+      return 'ancient'
+    default:
+      return 'rare'
+  }
+}

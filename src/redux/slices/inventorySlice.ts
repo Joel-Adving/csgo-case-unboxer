@@ -41,22 +41,18 @@ export const inventorySlice = createSlice({
 
 export default inventorySlice.reducer
 
+const { actions } = inventorySlice
+
 export const useInventory = () => {
   const dispatch = useDispatch()
-  const inventory = useSelector((state: RootState) => state.inventory)
+  const { inventory } = useSelector((state: RootState) => state)
 
-  const clearInventory = useCallback(() => dispatch(inventorySlice.actions.clearInventory()), [dispatch])
-  const toggleInventory = useCallback(() => dispatch(inventorySlice.actions.toggleInventory()), [dispatch])
-  const setInventory = useCallback((items: Skin[]) => dispatch(inventorySlice.actions.setInventory(items)), [dispatch])
-  const addInventoryItem = useCallback((item: Skin) => dispatch(inventorySlice.actions.addInventoryItem(item)), [dispatch])
-  const setShowInventory = useCallback(
-    (show: boolean) => dispatch(inventorySlice.actions.setShowInventory(show)),
-    [dispatch]
-  )
-  const removeInventoryItem = useCallback(
-    (id: string) => dispatch(inventorySlice.actions.removeInventoryItem(id)),
-    [dispatch]
-  )
+  const clearInventory = useCallback(() => dispatch(actions.clearInventory()), [dispatch])
+  const toggleInventory = useCallback(() => dispatch(actions.toggleInventory()), [dispatch])
+  const setInventory = useCallback((items: Skin[]) => dispatch(actions.setInventory(items)), [dispatch])
+  const addInventoryItem = useCallback((item: Skin) => dispatch(actions.addInventoryItem(item)), [dispatch])
+  const setShowInventory = useCallback((show: boolean) => dispatch(actions.setShowInventory(show)), [dispatch])
+  const removeInventoryItem = useCallback((id: string) => dispatch(actions.removeInventoryItem(id)), [dispatch])
 
   return {
     inventory,

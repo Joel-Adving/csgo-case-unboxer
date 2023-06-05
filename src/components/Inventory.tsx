@@ -3,14 +3,13 @@
 import Image from 'next/image'
 import { useEffect, useMemo } from 'react'
 import { useInventory } from '@/redux/slices/inventorySlice'
-import Modal from './Modal'
-import { useModal } from '@/redux/slices/modalSlice'
 import Button from './Button'
 import { getPrice } from '@/utils/balanceHelper'
+import Modal, { useModal } from './Modal'
 
 export default function Inventory() {
   const { inventory, clearInventory, setInventory } = useInventory()
-  const { openModal, closeModal } = useModal()
+  const { showModal, closeModal } = useModal('inventory-modal')
 
   const balance = useMemo(() => {
     return inventory.items.reduce((acc, item) => {
@@ -31,14 +30,12 @@ export default function Inventory() {
 
   return (
     <>
-      <Button className={`btn border-slate-500 border`} onClick={() => openModal('inventory')}>
-        Inventory
-      </Button>
+      <Button onClick={showModal}>Inventory</Button>
 
-      <Modal targetModal="inventory" scroll={false} allowClickOutside={true} allowClose={true}>
+      <Modal id="inventory-modal" className="w-full max-w-5xl sm:max-h-[70vh] p-0">
         <div className="relative w-full h-screen sm:h-auto max-w-5xl p-3 sm:p-6 overflow-y-auto rounded sm:min-h-[50vh] bg-slate-800">
           <div className="flex-col w-full gap-2 pb-4 mx-auto sm:pb-6 whitespace-nowrap ">
-            <div className="flex items-center w-full gap-3">
+            <div className="flex flex-col-reverse items-center w-full gap-3 sm:flex-row">
               <div className="flex gap-4 mr-auto">
                 <p className="text-xl">
                   <span className="text-3xl">{inventory.items.length}</span> items
@@ -48,15 +45,17 @@ export default function Inventory() {
                 </p>
               </div>
 
-              {inventory.items.length > 0 ? (
-                <Button className="text-red-500 border border-red-500 btn" onClick={() => clearInventory()}>
-                  Clean inventory
-                </Button>
-              ) : null}
+              <div className="flex justify-between w-full gap-4 sm:justify-end">
+                {inventory.items.length > 0 ? (
+                  <Button className="text-red-500 border border-red-500" onClick={() => clearInventory()}>
+                    Clean inventory
+                  </Button>
+                ) : null}
 
-              <Button className="border btn border-slate-500" onClick={() => closeModal('inventory')}>
-                Close
-              </Button>
+                <Button className="border border-slate-500" onClick={closeModal}>
+                  Close
+                </Button>
+              </div>
             </div>
           </div>
 
