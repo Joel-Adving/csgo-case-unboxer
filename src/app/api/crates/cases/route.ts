@@ -7,5 +7,6 @@ export async function GET() {
       type: 'Case'
     }
   })
+  console.log(crates)
   return NextResponse.json(crates)
 }
