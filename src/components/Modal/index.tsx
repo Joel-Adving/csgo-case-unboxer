@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useRef } from 'react'
 import style from './style.module.css'
 
-// add new modals here
-type Modals = 'inventory-modal' | 'options-modal'
+type ModalID = 'inventory-modal' | 'options-modal'
 
 interface Props extends React.HTMLAttributes<HTMLDialogElement> {
-  id: Modals
+  id: ModalID
   children: JSX.Element
 }
 
@@ -17,33 +16,26 @@ export default function Modal({ children, className, ...rest }: Props) {
   )
 }
 
-export function useModal(id: Modals) {
-  const selectedModal = useRef<HTMLDialogElement | null>(null)
-  const showModal = useCallback(() => selectedModal?.current?.showModal(), [])
-  const closeModal = useCallback(() => selectedModal?.current?.close(), [])
+export function useModal(id: ModalID) {
+  const modal = useRef<HTMLDialogElement | null>(null)
+
+  const showModal = useCallback(() => modal?.current?.showModal(), [modal])
+  const closeModal = useCallback(() => modal?.current?.close(), [modal])
 
   useEffect(() => {
-    const modal = document.getElementById(id) as HTMLDialogElement
-    if (!modal) return
-    selectedModal.current = modal
+    modal.current = document.getElementById(id) as HTMLDialogElement
   }, [id])
 
   useEffect(() => {
-    if (!selectedModal?.current) return
-    const event = (event: MouseEvent) => {
-      const node = event.target as HTMLDialogElement
-      let rect = node.getBoundingClientRect()
-      if (
-        rect.left > event.clientX ||
-        rect.right < event.clientX ||
-        rect.top > event.clientY ||
-        rect.bottom < event.clientY
-      ) {
-        selectedModal?.current?.close()
+    if (!modal?.current) return
+    const eventHandler = (e: MouseEvent) => {
+      const rect = (e.target as HTMLDialogElement).getBoundingClientRect()
+      if (rect.left > e.clientX || rect.right < e.clientX || rect.top > e.clientY || rect.bottom < e.clientY) {
+        modal?.current?.close()
       }
     }
-    selectedModal.current.addEventListener('click', event)
-    return () => selectedModal.current?.removeEventListener('click', event)
+    modal.current.addEventListener('click', eventHandler)
+    return () => modal.current?.removeEventListener('click', eventHandler)
   }, [])
 
   return { showModal, closeModal }
