@@ -28,7 +28,7 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
   const { options, setShowKnifesAndGloves } = useOptions()
   const { autoOpen, fastMode, highChance, showKnifesAndGloves } = options
   const { data: crate } = useGetCrateSkinsQuery(params.id)
-  const { addInventoryItem } = useInventory()
+  const { addInventoryItem, inventory } = useInventory()
 
   const wonSkinRarity = useMemo(() => wonSkin && getRarity(wonSkin), [wonSkin])
 
@@ -57,7 +57,7 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
     () => (
       <Button
         disabled={animating}
-        className="px-5 py-1.5 text-lg text-green-400 border-green-400 hover:bg-green-400 hover:text-gray-950 hover:border-gray-950"
+        className="px-5 py-1 text-lg text-green-400 border-green-400 hover:bg-green-400 hover:text-gray-950 hover:border-gray-950"
         onClick={() => {
           handleOpenCase()
           setShouldOpen((prev) => !prev)
@@ -91,12 +91,12 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
       let delay = 100
       for (let i = 0; i < amount; i++) {
         playItemScroll()
-        delay += 4 * (1 - Math.pow(1 - i / amount, 3))
+        delay += 4 * (1 - Math.pow(1 - i / amount, 1.5))
         await new Promise((resolve) => setTimeout(resolve, delay))
       }
     }
 
-    playSound(fastMode ? 10 : 39)
+    playSound(fastMode ? 10 : 43)
 
     const timeout = setTimeout(
       () => {
@@ -121,10 +121,10 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
       </div>
 
       <div className="flex flex-col">
-        <Image width={300} height={300} priority src={crate.image} className="max-w-[8rem] w-full mt-2 mx-auto" alt="" />
-        <p className="my-1 text-lg text-center sm:text-2xl">{crate.name}</p>
+        <Image width={300} height={300} priority src={crate.image} className="max-w-[6rem] w-full mt-2 mx-auto" alt="" />
+        <p className="my-1 text-lg font-thin text-center sm:text-xl">{crate.name}</p>
 
-        <div className="flex-col items-center hidden gap-4 mx-auto mt-3 mb-1 sm:flex">
+        <div className="flex-col items-center hidden gap-4 mx-auto mt-4 mb-1 sm:flex">
           {raffleSkins && <Options />}
           <OpenCaseButton />
         </div>
@@ -156,19 +156,19 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
         </div>
       )}
 
-      <div className="fixed gap-3 bottom-0 left-0 grid w-full p-2.5 place-items-center sm:hidden bg-slate-950">
+      <div className="fixed gap-3 flex w-full items-center justify-center bottom-0 left-0 p-2.5 place-items-center sm:hidden bg-slate-950">
         <Options />
         <OpenCaseButton />
       </div>
 
       <div className="flex flex-col">
         {!crate?.name?.includes('Souvenir') && (
-          <Button className="mx-auto mt-2" onClick={() => setShowKnifesAndGloves(!showKnifesAndGloves)}>
+          <Button className="mx-auto mt-3" onClick={() => setShowKnifesAndGloves(!showKnifesAndGloves)}>
             {showKnifesAndGloves ? 'Hide' : 'Show'} knifes and gloves
           </Button>
         )}
 
-        <div id="skins" className="p-4 my-5 rounded gap-x-3 gap-y-2 bg-slate-800 responsive-grid">
+        <div id="skins" className="p-4 my-5 mb-24 rounded gap-x-3 gap-y-2 bg-slate-800 responsive-grid sm:mb-0">
           {displayedSkins?.map((skin, i: number) => (
             <div key={i}>
               <Image

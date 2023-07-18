@@ -18,9 +18,9 @@ export default function Inventory() {
   }, [inventory.items])
 
   useEffect(() => {
-    const localInventory = JSON.parse(localStorage.getItem('inventory') ?? '[]')
-    if (localInventory) {
-      setInventory(localInventory)
+    const inventory = JSON.parse(localStorage.getItem('inventory') ?? '[]')
+    if (inventory) {
+      setInventory(inventory)
     }
   }, [setInventory])
 
@@ -64,7 +64,7 @@ export default function Inventory() {
               ?.slice()
               ?.reverse()
               ?.map((skin, i) => (
-                <div key={i} className="flex flex-col items-center gap-2">
+                <div key={i} className="relative flex flex-col items-center gap-2">
                   <Image
                     width={250}
                     height={250}
@@ -72,7 +72,10 @@ export default function Inventory() {
                     alt=""
                     style={{ borderColor: `#${skin?.rarity_color}` }}
                     className={`border-l-4 bg-slate-700 p-3 rounded-sm`}
-                  />
+                  ></Image>
+                  <p className="absolute text-green-400 top-0.5 right-1 text-sm font-semibold">
+                    {getPrice(skin).toFixed(2)} €
+                  </p>
                   <p className="text-xs text-center">{skin.name}</p>
                 </div>
               ))}

@@ -123,16 +123,19 @@ export async function PUT(request: Request) {
   const csgobackpackData = await fetch(CSGO_BACKPACK_API).then((res) => res.json())
   const skins = combineGrades(csgobackpackData)
 
-  for (let i = 0; i < skins.length; i++) {
-    await prisma.skin.update({
-      where: {
-        classid: skins[i].classid
-      },
-      data: {
-        prices: skins[i].prices
-      }
-    })
-  }
+  try {
+    for (let i = 0; i < skins.length; i++) {
+      if (!skins[i].prices || !skins[i].classid) continue
+      await prisma.skin.update({
+        where: {
+          classid: skins[i].classid
+        },
+        data: {
+          prices: skins[i].prices
+        }
+      })
+    }
+  } catch (error) {}
 
   return NextResponse.json({ message: 'success' })
 }

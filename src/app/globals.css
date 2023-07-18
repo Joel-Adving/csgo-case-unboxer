@@ -6,11 +6,13 @@
   color-scheme: light dark;
 }
 
-html {
+html,
+dialog {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
     'Helvetica Neue', sans-serif;
+  color: theme('colors.slate.300');
 }
 
 body {
@@ -24,5 +26,5 @@ img {
 
 .responsive-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(112.5px, 1fr));
 }

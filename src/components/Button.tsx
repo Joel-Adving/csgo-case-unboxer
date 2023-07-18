@@ -1,3 +1,5 @@
+'use client'
+
 import { useAudio } from '@/hooks/useAudio'
 import React, { useEffect, useRef } from 'react'
 

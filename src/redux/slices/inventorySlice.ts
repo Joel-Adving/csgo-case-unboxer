@@ -23,12 +23,14 @@ export const inventorySlice = createSlice({
     },
     addInventoryItem: (state, action) => {
       state.items.push(action.payload)
+      localStorage.setItem('inventory', JSON.stringify(state.items))
     },
     removeInventoryItem: (state, action) => {
       state.items = state.items.filter((item) => item.id !== action.payload)
     },
     clearInventory: (state) => {
       state.items = []
+      localStorage.removeItem('inventory')
     },
     toggleInventory: (state) => {
       state.show = !state.show

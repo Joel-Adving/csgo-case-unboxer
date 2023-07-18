@@ -13,7 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <Providers>
           <Header />
-          <main className="relative w-full max-w-5xl min-h-[93.15vh] p-3 mx-auto text-slate-300">{children}</main>
+          <main className="relative w-full max-w-5xl min-h-[93.15vh] p-3 mx-auto">{children}</main>
         </Providers>
       </body>
     </html>
