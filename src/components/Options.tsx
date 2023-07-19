@@ -3,21 +3,24 @@ import Modal, { useModal } from './Modal'
 import Button from './Button'
 import { useOptions } from '@/redux/slices/optionsSlice'
 
-export default function Options() {
+type Props = {
+  buttonStyle?: string
+}
+
+export default function Options({ buttonStyle }: Props) {
   const { showModal, closeModal } = useModal('options-modal')
   const { options, setAutoOpen, setFastMode, setHighChance, setAudio } = useOptions()
   const { fastMode, autoOpen, highChance, audio } = options
 
   return (
     <>
-      <Button onClick={showModal}>Options</Button>
+      <Button className={buttonStyle} onClick={showModal}>
+        Options
+      </Button>
 
-      <Modal
-        id="options-modal"
-        className="rounded shadow-2xl bg-slate-800 max-w-2xl sm:max-w-md sm:w-full h-[80dvh] sm:h-[45dvh]"
-      >
-        <div className="flex flex-col justify-between h-full">
-          <div className="flex flex-col gap-3 items-center justify-center sm:mt-[9dvh] mt-[25dvh]">
+      <Modal id="options-modal" className="pt-12 pb-8 rounded shadow-2xl sm:pb-10 sm:p-14 bg-slate-800 ">
+        <div className="flex flex-col justify-between">
+          <div className="flex flex-col items-center justify-center gap-3">
             <div className="flex gap-3">
               <Button className={`${fastMode ? '' : 'bg-slate-500 text-slate-50'}`} onClick={() => setFastMode(false)}>
                 1x Speed
@@ -52,7 +55,7 @@ export default function Options() {
             </div>
           </div>
 
-          <Button onClick={closeModal} className="mx-auto mb-4">
+          <Button onClick={closeModal} className="mx-auto mt-7">
             Close
           </Button>
         </div>

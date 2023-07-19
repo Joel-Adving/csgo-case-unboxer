@@ -18,7 +18,7 @@ export default function Inventory() {
       case 'rarity':
         return raritySorter(inventory.items)
       case 'latest':
-        return inventory.items.slice().reverse()
+        return inventory.items
       default:
         return inventory.items
     }
@@ -40,15 +40,15 @@ export default function Inventory() {
   }, [setInventory, inventory.items])
 
   return (
-    <div className="relative w-full sm:mt-6 sm:h-auto max-w-5xl p-3 px-4 sm:p-6 overflow-y-auto rounded min-h-[90dvh] sm:min-h-[65dvh] bg-slate-800">
-      <div className="flex-col w-full gap-2 pb-4 mx-auto sm:pb-6 whitespace-nowrap ">
+    <div className="relative w-full sm:mt-2 overflow-auto max-w-5xl p-3 px-4 sm:p-6 pt-0 sm:pt-0 rounded h-[88vh] bg-slate-800">
+      <div className="sticky top-0 z-10 flex-col w-full gap-2 pt-5 pb-4 mx-auto sm:pb-6 whitespace-nowrap bg-slate-800">
         <div className="flex flex-row flex-wrap items-center w-full gap-3">
-          <div className="flex gap-4 mr-auto">
-            <p className="text-xl">
-              <span className="text-3xl">{inventory.items.length}</span> items
-            </p>
+          <div className="flex justify-between w-full gap-4">
             <p className="text-xl text-green-400">
               <span className="text-3xl">{balance.toFixed(2)}</span> €
+            </p>
+            <p className="text-xl">
+              <span className="text-3xl">{inventory.items.length}</span> items
             </p>
           </div>
         </div>
@@ -57,7 +57,7 @@ export default function Inventory() {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className={`px-4 py-1 text-gray-300 border bg-slate-800 border-gray-400 rounded w-fit hover:border-gray-100 hover:text-gray-100`}
+            className={`px-2 py-1 text-gray-300 border bg-slate-800 border-gray-400 rounded w-fit hover:border-gray-100 hover:text-gray-100`}
           >
             <option value="sortby">Sort by</option>
             <option value="price">Price</option>
@@ -67,7 +67,7 @@ export default function Inventory() {
 
           {inventory.items.length > 0 ? (
             <Button className="text-red-500 border border-red-500" onClick={() => clearInventory()}>
-              Clear inventory
+              Reset inventory
             </Button>
           ) : null}
         </div>

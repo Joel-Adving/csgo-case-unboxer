@@ -1,7 +1,7 @@
 import React from 'react'
-import { ToastContainer as Container } from 'react-toastify'
+import { ToastContainer as Container, ToastContainerProps } from 'react-toastify'
 
-export default function ToastContainer() {
+export default function ToastContainer({ ...props }) {
   return (
     <Container
       position="top-right"
@@ -18,6 +18,7 @@ export default function ToastContainer() {
         maxWidth: '17rem',
         width: '100%'
       }}
+      {...props}
     />
   )
 }

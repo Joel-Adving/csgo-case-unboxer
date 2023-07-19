@@ -28,7 +28,7 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
   const { options, setShowKnifesAndGloves } = useOptions()
   const { autoOpen, fastMode, highChance, showKnifesAndGloves } = options
   const { data: crate } = useGetCrateSkinsQuery(params.id)
-  const { addInventoryItem, inventory } = useInventory()
+  const { addInventoryItem } = useInventory()
 
   const wonSkinRarity = useMemo(() => wonSkin && getRarity(wonSkin), [wonSkin])
 
@@ -116,22 +116,20 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
 
   return crate && skins.length > 0 ? (
     <div className="w-full max-w-6xl mx-auto">
-      <div className="hidden sm:block">
-        <ToastContainer />
-      </div>
+      <ToastContainer />
 
       <div className="flex flex-col">
+        <p className="my-1 text-lg text-center ">{crate.name}</p>
         <Image width={300} height={300} priority src={crate.image} className="max-w-[6rem] w-full mt-2 mx-auto" alt="" />
-        <p className="my-1 text-lg font-thin text-center sm:text-xl">{crate.name}</p>
 
-        <div className="flex-col items-center hidden gap-4 mx-auto mt-4 mb-1 sm:flex">
+        <div className="flex-col items-center hidden gap-4 mx-auto mt-4 mb-4 sm:flex">
           {raffleSkins && <Options />}
           <OpenCaseButton />
         </div>
       </div>
 
       {raffleSkins && (
-        <div className="grid h-[40dvh] mb-[30dvh] sm:mb-[40dvh] place-content-center overflow-hidden">
+        <div className="grid h-[40vh] mb-[30vh] sm:mb-[40vh] place-content-center overflow-hidden">
           <div className="relative h-[159px] w-[62.5rem] overflow-hidden">
             <div ref={pinRef} className="absolute top-0 z-[1] left-[50%] w-0.5 h-full bg-yellow-400"></div>
             <div ref={raffleElement} className="absolute left-0 top-0 flex gap-3 translate-x-[-80%]">
@@ -157,13 +155,13 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
       )}
 
       <div className="fixed gap-3 flex w-full items-center justify-center bottom-0 left-0 p-2.5 place-items-center sm:hidden bg-slate-950">
-        <Options />
+        <Options buttonStyle="px-5 py-1 text-lg" />
         <OpenCaseButton />
       </div>
 
       <div className="flex flex-col">
         {!crate?.name?.includes('Souvenir') && (
-          <Button className="mx-auto mt-3" onClick={() => setShowKnifesAndGloves(!showKnifesAndGloves)}>
+          <Button className="mx-auto" onClick={() => setShowKnifesAndGloves(!showKnifesAndGloves)}>
             {showKnifesAndGloves ? 'Hide' : 'Show'} knifes and gloves
           </Button>
         )}
