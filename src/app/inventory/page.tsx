@@ -40,9 +40,9 @@ export default function Inventory() {
   }, [setInventory, inventory.items])
 
   return (
-    <div className="relative w-full sm:mt-2 overflow-auto max-w-5xl p-3 px-4 sm:p-6 pt-0 sm:pt-0 rounded h-[88vh] bg-slate-800">
-      <div className="sticky top-0 z-10 flex-col w-full gap-2 pt-5 pb-4 mx-auto sm:pb-6 whitespace-nowrap bg-slate-800">
-        <div className="flex flex-row flex-wrap items-center w-full gap-3">
+    <div className="relative max-w-5xl p-3 px-4 pt-0 overflow-hidden rounded h-[87vh] sm:p-6 sm:pt-0 bg-slate-800">
+      <div className="flex-col gap-2 pt-5 pb-4">
+        <div className="flex flex-row flex-wrap gap-3">
           <div className="flex justify-between w-full gap-4">
             <p className="text-xl text-green-400">
               <span className="text-3xl">{balance.toFixed(2)}</span> €
@@ -73,7 +73,7 @@ export default function Inventory() {
         </div>
       </div>
 
-      <div className="gap-3 overflow-auto responsive-grid">
+      <div className="h-full gap-3 pt-1 pb-32 overflow-y-auto sm:h-auto responsive-grid">
         {items
           ?.slice()
           ?.reverse()
