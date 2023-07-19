@@ -40,7 +40,7 @@ export default function Inventory() {
   }, [setInventory, inventory.items])
 
   return (
-    <div className="max-w-5xl sm:mt-4 p-3 px-4 pt-0 overflow-hidden rounded h-[84vh] sm:p-6 sm:pt-0 bg-slate-800">
+    <div className="max-w-5xl mt-1 sm:mt-4 p-3 px-4 pt-0 pb-32 overflow-hidden rounded h-[84vh] sm:p-6 sm:pt-0 bg-slate-800">
       <div className="flex-col gap-2 pt-5 pb-4">
         <div className="flex flex-row flex-wrap gap-3">
           <div className="flex justify-between w-full gap-4">
@@ -73,7 +73,7 @@ export default function Inventory() {
         </div>
       </div>
 
-      <div className="h-full gap-3 pt-4 pb-32 overflow-y-auto md:h-auto responsive-grid">
+      <div className="h-full gap-3 pt-1 overflow-y-auto md:h-auto responsive-grid">
         {items
           ?.slice()
           ?.reverse()
