@@ -159,7 +159,7 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
         <OpenCaseButton />
       </div>
 
-      <div className="flex flex-col">
+      <div className="flex flex-col mb-10">
         {!crate?.name?.includes('Souvenir') && (
           <Button className="mx-auto" onClick={() => setShowKnifesAndGloves(!showKnifesAndGloves)}>
             {showKnifesAndGloves ? 'Hide' : 'Show'} knifes and gloves
