@@ -40,45 +40,47 @@ export default function Inventory() {
   }, [setInventory, inventory.items])
 
   return (
-    <div className="max-w-5xl mt-1 sm:mt-4 p-3 px-4 pt-0 pb-32 overflow-hidden rounded h-[84vh] sm:p-6 sm:pt-0 bg-slate-800">
-      <div className="flex-col gap-2 pt-5 pb-4">
-        <div className="flex flex-row flex-wrap gap-3">
-          <div className="flex justify-between w-full gap-4">
-            <p className="text-xl text-green-400">
-              <span className="text-3xl">{balance.toFixed(2)}</span> €
-            </p>
-            <p className="text-xl">
-              <span className="text-3xl">{inventory.items.length}</span> items
-            </p>
+    <>
+      <div className="max-w-5xl">
+        <div className="flex-col gap-3 pt-3 pb-6">
+          <div className="flex flex-row flex-wrap gap-3">
+            <div className="flex justify-between w-full gap-4">
+              <p className="text-xl text-green-400">
+                <span className="text-3xl">{balance.toFixed(2)}</span> €
+              </p>
+              <p className="text-xl">
+                <span className="text-3xl">{inventory.items.length}</span> items
+              </p>
+            </div>
           </div>
-        </div>
 
-        <div className="flex items-center justify-between mt-3">
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className={`px-2 py-1 text-gray-300 border bg-slate-800 border-gray-400 rounded w-fit hover:border-gray-100 hover:text-gray-100`}
-          >
-            <option value="sortby">Sort by</option>
-            <option value="price">Price</option>
-            <option value="rarity">Rarity</option>
-            <option value="latest">Latest</option>
-          </select>
+          <div className="flex items-center justify-between mt-3">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className={`px-2 py-1 text-gray-300 border bg-slate-800 border-gray-400 rounded w-fit hover:border-gray-100 hover:text-gray-100`}
+            >
+              <option value="sortby">Sort by</option>
+              <option value="price">Price</option>
+              <option value="rarity">Rarity</option>
+              <option value="latest">Latest</option>
+            </select>
 
-          {inventory.items.length > 0 ? (
-            <Button className="text-red-500 border border-red-500" onClick={() => clearInventory()}>
-              Reset inventory
-            </Button>
-          ) : null}
+            {inventory.items.length > 0 ? (
+              <Button className="text-red-500 border border-red-500" onClick={() => clearInventory()}>
+                Reset inventory
+              </Button>
+            ) : null}
+          </div>
         </div>
       </div>
 
-      <div className="h-full gap-3 pt-1 overflow-y-auto md:h-auto responsive-grid">
+      <div className="gap-3 responsive-grid md:flex md:flex-wrap">
         {items
           ?.slice()
           ?.reverse()
           ?.map((skin, i) => (
-            <div key={i} className="flex flex-col items-center gap-2">
+            <div key={i} className="flex flex-col items-center gap-2 md:w-[114.5px]">
               <div className="relative">
                 <Image
                   width={250}
@@ -96,6 +98,6 @@ export default function Inventory() {
             </div>
           ))}
       </div>
-    </div>
+    </>
   )
 }

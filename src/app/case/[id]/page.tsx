@@ -15,6 +15,7 @@ import { useAudio } from '@/hooks/useAudio'
 import Button from '@/components/Button'
 import { useOptions } from '@/redux/slices/optionsSlice'
 import Options from '@/components/Options'
+import { useWindowSize } from '@/hooks/useWindowSize'
 
 const FAST_MODE = 1000
 const NORMAL_MODE = 6000
@@ -25,6 +26,7 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
   const [shouldOpen, setShouldOpen] = useState(false)
   const [raffleSkins, setRaffleSkins] = useState<Skin[] | null>(null)
 
+  const { width } = useWindowSize()
   const { options, setShowKnifesAndGloves } = useOptions()
   const { autoOpen, fastMode, highChance, showKnifesAndGloves } = options
   const { data: crate } = useGetCrateSkinsQuery(params.id)
@@ -116,10 +118,10 @@ export default function CaseIdPage({ params }: { params: { id: string } }) {
 
   return crate && skins.length > 0 ? (
     <div className="w-full max-w-6xl mx-auto">
-      <ToastContainer />
+      {width < 640 ? <ToastContainer limit={2} autoClose={250} /> : <ToastContainer />}
 
-      <div className="flex flex-col">
-        <p className="my-1 text-lg text-center ">{crate.name}</p>
+      <div className="flex flex-col mt-2">
+        <h1 className="my-1 text-xl text-center sm:text-2xl">{crate.name}</h1>
         <Image width={300} height={300} priority src={crate.image} className="max-w-[6rem] w-full mt-2 mx-auto" alt="" />
 
         <div className="flex-col items-center hidden gap-4 mx-auto mt-4 mb-4 sm:flex">

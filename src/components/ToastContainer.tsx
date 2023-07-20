@@ -12,6 +12,7 @@ export default function ToastContainer({ ...props }) {
       rtl={false}
       pauseOnFocusLoss
       draggable
+      limit={3}
       pauseOnHover
       theme="dark"
       style={{
