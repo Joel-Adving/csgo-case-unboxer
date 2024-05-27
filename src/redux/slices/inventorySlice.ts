@@ -47,7 +47,7 @@ const { actions } = inventorySlice
 
 export const useInventory = () => {
   const dispatch = useDispatch()
-  const { inventory } = useSelector((state: RootState) => state)
+  const inventory = useSelector((state: RootState) => state.inventory)
 
   const clearInventory = useCallback(() => dispatch(actions.clearInventory()), [dispatch])
   const toggleInventory = useCallback(() => dispatch(actions.toggleInventory()), [dispatch])

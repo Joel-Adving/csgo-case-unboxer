@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 
-// allow all domainds with http and https wildcard
 const nextConfig = {
   images: {
     remotePatterns: [

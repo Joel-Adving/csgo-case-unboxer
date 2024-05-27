@@ -47,7 +47,7 @@ const { actions } = optionsSlice
 
 export const useOptions = () => {
   const dispatch = useDispatch()
-  const { options } = useSelector((state: RootState) => state)
+  const options = useSelector((state: RootState) => state.options)
 
   const setAudio = useCallback((audio: boolean) => dispatch(actions.setAudio(audio)), [dispatch])
   const setFastMode = useCallback((fastMode: boolean) => dispatch(actions.setFastMode(fastMode)), [dispatch])

@@ -1,9 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit'
 import optionsReducer from './slices/optionsSlice'
 import inventoryReducer from './slices/inventorySlice'
-import { setupListeners } from '@reduxjs/toolkit/dist/query'
 import { api } from './services/api'
 import { csgoApi } from './services/bymykelApi'
+import { setupListeners } from '@reduxjs/toolkit/query'
 
 export const store = configureStore({
   reducer: {
